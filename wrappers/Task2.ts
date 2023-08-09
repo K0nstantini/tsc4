@@ -1,4 +1,13 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
+import {
+    Address,
+    beginCell,
+    Cell,
+    Contract,
+    contractAddress,
+    ContractProvider,
+    Sender,
+    SendMode, Tuple
+} from 'ton-core';
 
 export type Task2Config = {};
 
@@ -25,5 +34,10 @@ export class Task2 implements Contract {
             sendMode: SendMode.PAY_GAS_SEPARATELY,
             body: beginCell().endCell(),
         });
+    }
+
+    async getMatrixMultiplier(provider: ContractProvider, m1: Tuple, m2: Tuple) {
+        const {stack} = await provider.get('matrix_multiplier', [m1, m2]);
+        return stack.readTuple();
     }
 }
