@@ -6,16 +6,62 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
+(int) tlen (tuple t) asm "TLEN";
+forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
+
 () recv_internal() {
+}
+
+(cell) cipher(int shift, cell text) inline {
+    slice ds = text.begin_parse();
+    ds~skip_bits(32);
+
+    tuple builders = empty_tuple();
+
+    builder cur_builder = begin_cell();
+    cur_builder~store_uint(0, 32);
+
+    int has_ref = - 1;
+    while (has_ref) {
+        while (~ ds.slice_data_empty?()) {
+            int letter = ds~load_uint(8);
+            (int quotient, int remainder) = (letter + shift) /% 123;
+            if ((quotient == 0) & (remainder < 65)) { ;; del?
+                remainder = 58 + remainder;
+            }
+            int new_letter = remainder + (quotient == 0 ? 0 : 65);
+            cur_builder~store_uint(new_letter, 8);
+        }
+        builders~tpush(cur_builder);
+
+        if (ds.slice_refs()) {
+            ds = ds~load_ref().begin_parse();
+            cur_builder = begin_cell();
+            has_ref = -1;
+        } else {
+            has_ref = 0;
+        }
+    }
+
+    builder value = builders~tpop();
+    cell dc = value.end_cell();
+
+    int count = builders.tlen();
+    repeat (count) {
+        value = builders~tpop();
+        dc = value.store_ref(dc).end_cell();
+    }
+
+    return dc;
 }
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  return begin_cell().end_cell();
+    return cipher(shift, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  return begin_cell().end_cell();
+    return cipher(- shift, text);
 }
 
