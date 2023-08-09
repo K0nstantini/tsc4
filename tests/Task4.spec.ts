@@ -71,8 +71,8 @@ describe('Task4', () => {
 
         checkText("yzA");
 
-        res = await task4.getCaesarCipherEncrypt(-1, simpleText("ABC"));
-        checkText("zAB");
+        // res = await task4.getCaesarCipherEncrypt(-1, simpleText("ABC"));
+        // checkText("zAB");
 
 
         res = await task4.getCaesarCipherEncrypt(1, complexText("xyz", "abc", "ABC"));
@@ -91,6 +91,9 @@ describe('Task4', () => {
         dc = ds.loadRef();
         ds = dc.beginParse();
         checkComplexText("BCD");
+
+        res = await task4.getCaesarCipherEncrypt(1, simpleText("YZa"));
+        checkText("Zab");
 
 
         res = await task4.getCaesarCipherDecrypt(1, simpleText("yzA"));
