@@ -12,7 +12,6 @@ forall X -> int is_null (X x) asm "ISNULL";
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
-int gas_consumed () asm "GASCONSUMED";
 
 () recv_internal() {
 }
@@ -32,7 +31,5 @@ int gas_consumed () asm "GASCONSUMED";
             stack~push_back(c);
         }
     }
-    int gas = gas_consumed();
-    ~dump(gas);
     return begin_cell().end_cell();
 }
