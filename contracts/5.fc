@@ -20,6 +20,10 @@
 (tuple) fibonacci_sequence (int n, int k) method_id {
     tuple result = empty_tuple();
 
+    if ((n + k) == 0) {
+        return result;
+    }
+
     (int prev, int next) = (0, 1);
 
     int save_i = n - 1;
