@@ -43,6 +43,10 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
                 new_letter = remainder + (quotient == 0 ? 0 : 65);
             }
 
+            if ((letter < 65) | (letter > 122) | ((letter > 90) & (letter < 97))) {
+                new_letter = letter;
+            }
+
             cur_builder~store_uint(new_letter, 8);
         }
         builders~tpush(cur_builder);
