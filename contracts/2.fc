@@ -23,20 +23,6 @@ forall X -> (tuple) to_tuple (X x) asm "NOP";
 
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
-    repeat (matrixA.tuple_length()) {
-        var row = matrixA~tpop();
-        repeat (row.tuple_length()) {
-
-        }
-        if (is_tuple(value)) {
-            tuple tuple_value = cast_to_tuple(value);
-            iterate_tuple(tuple_value);
-        } else {
-            if(value > max_value) {
-                max_value = value;
-            }
-        }
-    }
     return null();
 }
 
