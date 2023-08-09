@@ -9,8 +9,6 @@
   After calculating the result matrix, the function should return final result (as tuple).
 -}
 
-#include "imports/stdlib.fc";
-
 int tlen (tuple t) asm "TLEN";
 
 () recv_internal() {
