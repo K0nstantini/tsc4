@@ -1,4 +1,14 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
+import {
+    Address,
+    beginCell,
+    Cell,
+    Contract,
+    contractAddress,
+    ContractProvider,
+    Sender,
+    SendMode,
+    TupleItemInt
+} from 'ton-core';
 
 export type Task5Config = {};
 
@@ -7,7 +17,8 @@ export function task5ConfigToCell(config: Task5Config): Cell {
 }
 
 export class Task5 implements Contract {
-    constructor(readonly address: Address, readonly init?: { code: Cell; data: Cell }) {}
+    constructor(readonly address: Address, readonly init?: { code: Cell; data: Cell }) {
+    }
 
     static createFromAddress(address: Address) {
         return new Task5(address);
@@ -15,7 +26,7 @@ export class Task5 implements Contract {
 
     static createFromConfig(config: Task5Config, code: Cell, workchain = 0) {
         const data = task5ConfigToCell(config);
-        const init = { code, data };
+        const init = {code, data};
         return new Task5(contractAddress(workchain, init), init);
     }
 
@@ -25,5 +36,21 @@ export class Task5 implements Contract {
             sendMode: SendMode.PAY_GAS_SEPARATELY,
             body: beginCell().endCell(),
         });
+    }
+
+    async getFibonacciSequence(provider: ContractProvider, n: number, k: number) {
+        const param1 = {
+            type: 'int',
+            value: BigInt(n)
+        } as TupleItemInt;
+
+        const param2 = {
+            type: 'int',
+            value: BigInt(k)
+        } as TupleItemInt;
+
+        const {stack} = await provider.get('fibonacci_sequence', [param1, param2]);
+        console.log(stack);
+        return stack.readTuple();
     }
 }
