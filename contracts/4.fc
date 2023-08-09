@@ -48,7 +48,9 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     int count = builders.tlen();
     repeat (count) {
         value = builders~tpop();
-        dc = value.store_ref(dc).end_cell();
+        dc = value
+                .store_ref(dc)
+                .end_cell();
     }
 
     return dc;
