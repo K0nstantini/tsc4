@@ -37,7 +37,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         if (ds.slice_refs()) {
             ds = ds~load_ref().begin_parse();
             cur_builder = begin_cell();
-            has_ref = -1;
         } else {
             has_ref = 0;
         }
