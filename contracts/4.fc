@@ -26,8 +26,12 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         while (~ ds.slice_data_empty?()) {
             int letter = ds~load_uint(8);
             int new_letter = letter + shift;
-            if ((letter <= 90) & new_letter > 90) {
+            if ((letter <= 90) & (new_letter > 90)) {
                 new_letter += 6;
+            }
+
+            if ((letter >= 97) & (new_letter < 97)) {
+                new_letter -= 6;
             }
 
             if (new_letter < 65) {

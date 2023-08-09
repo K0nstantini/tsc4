@@ -99,6 +99,8 @@ describe('Task4', () => {
         res = await task4.getCaesarCipherDecrypt(1, simpleText("yzA"));
         checkText("xyz");
 
+        res = await task4.getCaesarCipherDecrypt(1, simpleText("Zab"));
+        checkText("YZa");
 
     });
 });
