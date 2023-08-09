@@ -25,28 +25,13 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     while (has_ref) {
         while (~ ds.slice_data_empty?()) {
             int letter = ds~load_uint(8);
-            int new_letter = letter + shift;
-            if ((letter <= 90) & (new_letter > 90)) {
-                new_letter += 6;
-            }
+            int new_letter = letter;
 
-            if ((letter >= 97) & (new_letter < 97)) {
-                new_letter -= 6;
+            if ((letter >= 65) & (letter <= 122) & ((letter <= 90) | (letter >= 97))) {
+                new_letter -= letter <= 90 ? 65 : 71;
+                new_letter = (new_letter + shift) % 52;
+                new_letter += new_letter <= 25 ? 65 : 71;
             }
-
-            if (new_letter < 65) {
-                new_letter += 58;
-            }
-
-            if (new_letter > 122) {
-                (int quotient, int remainder) = new_letter /% 123;
-                new_letter = remainder + (quotient == 0 ? 0 : 65);
-            }
-
-            if ((letter < 65) | (letter > 122) | ((letter > 90) & (letter < 97))) {
-                new_letter = letter;
-            }
-
             cur_builder~store_uint(new_letter, 8);
         }
         builders~tpush(cur_builder);
