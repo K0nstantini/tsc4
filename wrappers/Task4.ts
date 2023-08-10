@@ -56,7 +56,7 @@ export class Task4 implements Contract {
     async getCaesarCipherDecrypt(provider: ContractProvider, shift: number, text: Cell) {
         const param1 = {
             type: 'int',
-            value: BigInt(-shift)
+            value: BigInt(shift)
         } as TupleItemInt;
 
         const param2 = {
@@ -64,7 +64,7 @@ export class Task4 implements Contract {
             cell: text,
         } as TupleItemCell;
 
-        const {stack} = await provider.get('caesar_cipher_encrypt', [param1, param2]);
+        const {stack} = await provider.get('caesar_cipher_decrypt', [param1, param2]);
         return stack.readCell();
     }
 }

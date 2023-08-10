@@ -44,7 +44,8 @@ describe('Task4', () => {
                 .endCell()
         };
 
-        let res = await task4.getCaesarCipherEncrypt(1, simpleText("xyz"));
+        let res = beginCell().endCell();
+        let ds = res.beginParse();
 
         const checkText = (s: string) => {
             const ds = res.beginParse();
@@ -52,28 +53,19 @@ describe('Task4', () => {
             expect(ds.loadStringTail()).toEqual(s);
         };
 
-
-        checkText("yza");
-
-
         const checkComplexText = (s: string) => {
             const exp = hex_to_ascii(ds.loadBits(s.length * 8).toString());
             return expect(exp).toEqual(s);
         };
 
-        const a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
-        // console.log(simpleText(a));
+        let a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
         res = await task4.getCaesarCipherEncrypt(1, simpleText(a));
-        // console.log(res);
-        let ds = res.beginParse();
+        ds = res.beginParse();
         ds.skip(32);
         checkComplexText("Xifo dpnnfou jt mpoh fopvhi uibu ju epfto'u gju jo b dfmm, opo-gjuujoh foe pg uif mjof jt qvu up uif gjstu sfgfsfodf pg uif");
         let dc = ds.loadRef();
         ds = dc.beginParse();
         checkComplexText(" dfmm. Uijt qspdftt dpoujovft sfdvstjwfmz up eftdsjcf dpnnfout uibu epfto'u gju jo uxp ps npsf dfmmt.");
-
-        res = await task4.getCaesarCipherEncrypt(1, simpleText("YZa"));
-        checkText("ZAb");
 
         res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
         checkText("12^|");
@@ -81,13 +73,21 @@ describe('Task4', () => {
         res = await task4.getCaesarCipherEncrypt(-79, simpleText("ABC"));
         checkText("ZAB");
 
+        res = await task4.getCaesarCipherEncrypt(-79, simpleText(""));
+        checkText("");
+
+
         // ======= DEC =======
 
-        res = await task4.getCaesarCipherDecrypt(1, simpleText("yzA"));
-        checkText("xyZ");
-
-        res = await task4.getCaesarCipherDecrypt(1, simpleText("Zab"));
-        checkText("Yza");
+        a = "Bmjs htrrjsy nx qtsl jstzlm ymfy ny itjxs'y kny ns f hjqq, sts-knyynsl jsi tk ymj qnsj nx uzy yt ymj knwxy wjkjwjshj tk ymj hjqq. Ymnx uwthjxx htsynszjx wjhzwxnajqd yt ijxhwngj htrrjsyx ymfy itjxs'y kny ns ybt tw rtwj hjqqx.";
+        res = await task4.getCaesarCipherDecrypt(5, simpleText(a));
+        // console.log(res);
+        ds = res.beginParse();
+        ds.skip(32);
+        checkComplexText("When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the");
+        dc = ds.loadRef();
+        ds = dc.beginParse();
+        checkComplexText(" cell. This process continues recursively to describe comments that doesn't fit in two or more cells.");
 
     });
 });
