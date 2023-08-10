@@ -15,6 +15,9 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
     int prefix = ds~load_uint(32);
+    if (ds.preload_uint(8) == 255) {
+        return text;
+    }
 
     tuple builders = empty_tuple();
 
