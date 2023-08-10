@@ -25,20 +25,13 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     while (has_ref) {
         while (~ ds.slice_data_empty?()) { ;; change to slice_bits()
             int letter = ds~load_uint(8);
-            int new_letter = letter;
 
-            if ((letter >= 65) & (letter <= 90)) {
-                new_letter -= 65;
-                new_letter = (new_letter + shift) % 26;
-                new_letter += 65;
-            }
+            int new_letter = ((letter >= 65) & (letter <= 90))
+                    ? (letter + shift - 65) % 26 + 65
+                    : ((letter >= 97) & (letter <= 122))
+                    ? (letter + shift - 97) % 26 + 97
+                    : letter;
 
-            if ((letter >= 97) & (letter <= 122)) {
-                new_letter -= 97;
-                new_letter = (new_letter + shift) % 26;
-                new_letter += 97;
-            }
-            ;
             cur_builder~store_uint(new_letter, 8);
         }
         builders~tpush(cur_builder);

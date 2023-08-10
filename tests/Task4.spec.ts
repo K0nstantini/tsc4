@@ -93,6 +93,11 @@ describe('Task4', () => {
         ds = dc.beginParse();
         checkComplexText("BCD");
 
+        // const a = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+        // console.log(simpleText(a));
+        // res = await task4.getCaesarCipherEncrypt(1, simpleText(a));
+        // console.log(res);
+
         res = await task4.getCaesarCipherEncrypt(1, simpleText("YZa"));
         // checkText("Zab");
         checkText("ZAb");
