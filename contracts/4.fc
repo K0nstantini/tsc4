@@ -27,11 +27,23 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
             int letter = ds~load_uint(8);
             int new_letter = letter;
 
-            if ((letter >= 65) & (letter <= 122) & ((letter <= 90) | (letter >= 97))) {
-                new_letter -= letter <= 90 ? 65 : 71;
-                new_letter = (new_letter + shift) % 52;
-                new_letter += new_letter <= 25 ? 65 : 71;
+            if ((letter >= 65) & (letter <= 90)) {
+                new_letter -= 65;
+                new_letter = (new_letter + shift) % 26;
+                new_letter += 65;
             }
+
+            if ((letter >= 97) & (letter <= 122)) {
+                new_letter -= 97;
+                new_letter = (new_letter + shift) % 26;
+                new_letter += 97;
+            }
+
+;;             if ((letter >= 65) & (letter <= 122) & ((letter <= 90) | (letter >= 97))) {
+;;                 new_letter -= letter <= 90 ? 65 : 71;
+;;                 new_letter = (new_letter + shift) % 52;
+;;                 new_letter += new_letter <= 25 ? 65 : 71;
+;;             }
             cur_builder~store_uint(new_letter, 8);
         }
         builders~tpush(cur_builder);
