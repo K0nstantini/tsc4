@@ -59,9 +59,9 @@ describe('Task4', () => {
         };
 
         let a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
-        console.log(simpleText(a));
+        // console.log(simpleText(a));
         res = await task4.getCaesarCipherEncrypt(-25, simpleText(a));
-        console.log(res);
+        // console.log(res);
         ds = res.beginParse();
         ds.skip(32);
         checkComplexText("Xifo dpnnfou jt mpoh fopvhi uibu ju epfto'u gju jo b dfmm, opo-gjuujoh foe pg uif mjof jt qvu up uif gjstu sfgfsfodf pg uif");

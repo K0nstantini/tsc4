@@ -15,7 +15,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
 
-    int prefix = ds~load_uint(32);
+    ds~skip_bits(32);
     if (ds.slice_empty?()) {
         return text;
     }
@@ -23,13 +23,12 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     tuple builders = empty_tuple();
 
     builder cur_builder = begin_cell();
-    cur_builder~store_uint(prefix, 32);
+    cur_builder~store_uint(0, 32);
 
-    int has_ref = - 1;
-    while (has_ref) {
-        slice cur_ds = ds~load_bits(ds.slice_bits());
-        while (~ cur_ds.slice_data_empty?()) { ;; change to slice_bits()
-            int letter = cur_ds~load_uint(8);
+    int has_ref = 1;
+    while (has_ref > 0) {
+        while (~ ds.slice_data_empty?()) { ;; change to slice_bits()
+            int letter = ds~load_uint(8);
 
             int new_letter = ((letter >= 65) & (letter <= 90))
                     ? (letter + shift - 65) % 26 + 65

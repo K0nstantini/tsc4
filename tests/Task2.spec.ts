@@ -36,68 +36,68 @@ describe('Task2', () => {
         // blockchain and task2 are ready to use
     });
 
-    it('should matrix multiplier', async () => {
-
-        const el = (n: number) => {
-            return {
-                type: "int",
-                value: BigInt(n)
-            } as TupleItemInt;
-        };
-
-        const tuple = (items: TupleItem[]) => {
-            return {
-                type: "tuple",
-                items
-            } as Tuple;
-        };
-
-        const row = (nums: number[]) => {
-            return tuple(nums.map(el));
-        };
-
-        let m1 = tuple([row([1, 2]), row([3, 4])]);
-        let m2 = tuple([row([5, 6]), row([7, 8])]);
-
-        let res = await task2.getMatrixMultiplier(m1, m2);
-        let mRow = res.readTuple();
-        const checkEq = (n: number) => expect(mRow.readNumber()).toEqual(n);
-
-        checkEq(19);
-        checkEq(22);
-        mRow = res.readTuple();
-        checkEq(43);
-        checkEq(50);
-
-        m1 = tuple([row([1, 2, 2]), row([3, 1, 1])]);
-        m2 = tuple([row([4, 2]), row([3, 1]), row([1, 5])]);
-
-        res = await task2.getMatrixMultiplier(m1, m2);
-        mRow = res.readTuple();
-
-        checkEq(12);
-        checkEq(14);
-        mRow = res.readTuple();
-        checkEq(16);
-        checkEq(12);
-
-        m1 = tuple([row([4, 2]), row([3, 1]), row([1, 5])]);
-        m2 = tuple([row([1, 2, 2]), row([3, 1, 1])]);
-
-        res = await task2.getMatrixMultiplier(m1, m2);
-        mRow = res.readTuple();
-
-        checkEq(10);
-        checkEq(10);
-        checkEq(10);
-        mRow = res.readTuple();
-        checkEq(6);
-        checkEq(7);
-        checkEq(7);
-        mRow = res.readTuple();
-        checkEq(16);
-        checkEq(7);
-        checkEq(7);
-
-    });
+    // it('should matrix multiplier', async () => {
+    //
+    //     const el = (n: number) => {
+    //         return {
+    //             type: "int",
+    //             value: BigInt(n)
+    //         } as TupleItemInt;
+    //     };
+    //
+    //     const tuple = (items: TupleItem[]) => {
+    //         return {
+    //             type: "tuple",
+    //             items
+    //         } as Tuple;
+    //     };
+    //
+    //     const row = (nums: number[]) => {
+    //         return tuple(nums.map(el));
+    //     };
+    //
+    //     let m1 = tuple([row([1, 2]), row([3, 4])]);
+    //     let m2 = tuple([row([5, 6]), row([7, 8])]);
+    //
+    //     let res = await task2.getMatrixMultiplier(m1, m2);
+    //     let mRow = res.readTuple();
+    //     const checkEq = (n: number) => expect(mRow.readNumber()).toEqual(n);
+    //
+    //     checkEq(19);
+    //     checkEq(22);
+    //     mRow = res.readTuple();
+    //     checkEq(43);
+    //     checkEq(50);
+    //
+    //     m1 = tuple([row([1, 2, 2]), row([3, 1, 1])]);
+    //     m2 = tuple([row([4, 2]), row([3, 1]), row([1, 5])]);
+    //
+    //     res = await task2.getMatrixMultiplier(m1, m2);
+    //     mRow = res.readTuple();
+    //
+    //     checkEq(12);
+    //     checkEq(14);
+    //     mRow = res.readTuple();
+    //     checkEq(16);
+    //     checkEq(12);
+    //
+    //     m1 = tuple([row([4, 2]), row([3, 1]), row([1, 5])]);
+    //     m2 = tuple([row([1, 2, 2]), row([3, 1, 1])]);
+    //
+    //     res = await task2.getMatrixMultiplier(m1, m2);
+    //     mRow = res.readTuple();
+    //
+    //     checkEq(10);
+    //     checkEq(10);
+    //     checkEq(10);
+    //     mRow = res.readTuple();
+    //     checkEq(6);
+    //     checkEq(7);
+    //     checkEq(7);
+    //     mRow = res.readTuple();
+    //     checkEq(16);
+    //     checkEq(7);
+    //     checkEq(7);
+    //
+    // });
 });

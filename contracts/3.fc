@@ -16,11 +16,124 @@
 
 -}
 
+(int) tlen (tuple t) asm "TLEN";
+forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
+
 () recv_internal() {
+}
+
+int int_len(int n) inline {
+    int len = 0;
+    while (n) {
+        n = n >> 1;
+        len += 1;
+    }
+    return len;
+}
+
+(int, int) break_int(int n, int int_len, int left_len, int right_len) inline {
+    cell dc = begin_cell().store_uint(n, int_len).end_cell();
+    slice ds = dc.begin_parse();
+    return (ds~load_uint(left_len), ds~load_uint(right_len));
 }
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
-  return begin_cell().end_cell();
+    tuple builders = empty_tuple();
+    builder cur_builder = begin_cell();
+
+    slice ds = linked_list.begin_parse();
+
+    int flag_len = int_len(flag);
+    int value_len = int_len(value);
+
+
+    slice remained_slice = begin_cell().end_cell().begin_parse();
+
+    int loaded_bits = 0;
+    int has_ref = 1;
+    while (has_ref > 0) {
+        int bits = ds.slice_bits();
+        while (bits >= flag_len) {
+            if (flag == ds.preload_uint(flag_len)) {
+                ds~skip_bits(flag_len);
+                if (loaded_bits + value_len <= 1023) {
+                    cur_builder~store_uint(value, value_len);
+                    loaded_bits += value_len;
+                } else {
+                    int left_len = (1023 - loaded_bits);
+                    int right_len = (value_len - left_len);
+                    (int left, int right) = break_int(value, value_len, left_len, right_len);
+                    cur_builder~store_uint(left, left_len);
+
+                    builders~tpush(cur_builder);
+                    cur_builder = begin_cell();
+                    cur_builder~store_uint(right, right_len);
+                    loaded_bits = right_len;
+                }
+                bits -= flag_len;
+            } else {
+                cur_builder~store_uint(ds~load_uint(1), 1);
+                loaded_bits += 1;
+                bits -= 1;
+            }
+            if (loaded_bits == 1023) {
+                builders~tpush(cur_builder);
+                cur_builder = begin_cell();
+                loaded_bits = 0;
+            }
+        }
+
+        if (remained_slice.slice_data_empty?()) {
+            if (ds.slice_refs_empty?()) {
+                if (bits > 0) {
+                    if (loaded_bits + bits <= 1023) {
+                        cur_builder~store_uint(ds~load_uint(bits), bits);
+                    } else {
+                        int left_len = (1023 - loaded_bits);
+                        int right_len = (bits - left_len);
+                        (int left, int right) = break_int(ds~load_uint(bits), bits, left_len, right_len);
+                        cur_builder~store_uint(left, left_len);
+
+                        builders~tpush(cur_builder);
+                        cur_builder = begin_cell();
+                        cur_builder~store_uint(right, right_len);
+                    }
+                }
+                builders~tpush(cur_builder);
+                has_ref = 0;
+            } else {
+                if (bits > 0) {
+                    int old_bits = ds~load_uint(bits);
+                    slice new_ds = ds~load_ref().begin_parse();
+                    int new_bits_len = min(flag_len - 1, new_ds.slice_bits());
+                    int new_bits = new_ds~load_uint(flag_len - 1);
+                    cell dc = begin_cell()
+                            .store_uint(old_bits, bits) ;; change to store just ds
+                            .store_uint(new_bits, new_bits_len)
+                            .end_cell();
+                    ds = dc.begin_parse();
+                    remained_slice = new_ds;
+                } else {
+                    ds = ds~load_ref().begin_parse();
+                }
+            }
+        } else {
+            ds = remained_slice;
+            remained_slice = begin_cell().end_cell().begin_parse();
+        }
+    }
+
+    builder value = builders~tpop();
+    cell dc = value.end_cell();
+
+    int count = builders.tlen();
+    repeat (count) {
+        value = builders~tpop();
+        dc = value.store_ref(dc).end_cell();
+    }
+
+    return dc;
+    ;;     return begin_cell().end_cell();
 }
 
