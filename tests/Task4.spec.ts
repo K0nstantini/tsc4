@@ -70,10 +70,8 @@ describe('Task4', () => {
         };
 
 
-        // checkText("yzA");
         checkText("yza");
 
-        // console.log( complexText("xyz", "abc", "ABC"));
         res = await task4.getCaesarCipherEncrypt(1, complexText("xyz", "abc", "ABC"));
         // console.log(res);
         let ds = res.beginParse();
@@ -84,7 +82,6 @@ describe('Task4', () => {
             return expect(exp).toEqual(s);
         };
 
-        // checkComplexText("yzA");
         checkComplexText("yza");
         let dc = ds.loadRef();
         ds = dc.beginParse();
@@ -93,13 +90,18 @@ describe('Task4', () => {
         ds = dc.beginParse();
         checkComplexText("BCD");
 
-        // const a = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+        const a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
         // console.log(simpleText(a));
-        // res = await task4.getCaesarCipherEncrypt(1, simpleText(a));
+        res = await task4.getCaesarCipherEncrypt(1, simpleText(a));
         // console.log(res);
+        ds = res.beginParse();
+        ds.skip(32);
+        checkComplexText("Xifo dpnnfou jt mpoh fopvhi uibu ju epfto'u gju jo b dfmm, opo-gjuujoh foe pg uif mjof jt qvu up uif gjstu sfgfsfodf pg uif");
+         dc = ds.loadRef();
+        ds = dc.beginParse();
+        checkComplexText(" dfmm. Uijt qspdftt dpoujovft sfdvstjwfmz up eftdsjcf dpnnfout uibu epfto'u gju jo uxp ps npsf dfmmt.");
 
         res = await task4.getCaesarCipherEncrypt(1, simpleText("YZa"));
-        // checkText("Zab");
         checkText("ZAb");
 
         res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
@@ -111,11 +113,9 @@ describe('Task4', () => {
         // ======= DEC =======
 
         res = await task4.getCaesarCipherDecrypt(1, simpleText("yzA"));
-        // checkText("xyz");
         checkText("xyZ");
 
         res = await task4.getCaesarCipherDecrypt(1, simpleText("Zab"));
-        // checkText("YZa");
         checkText("Yza");
 
     });
