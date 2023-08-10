@@ -15,6 +15,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
     int prefix = ds~load_uint(32);
+
     if (ds.preload_uint(8) == 255) {
         return text;
     }
@@ -22,7 +23,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     tuple builders = empty_tuple();
 
     builder cur_builder = begin_cell();
-    cur_builder~store_uint(prefix, 32);
+;;     cur_builder~store_uint(prefix, 32);
 
     int has_ref = - 1;
     while (has_ref) {
