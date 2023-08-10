@@ -30,7 +30,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     int has_ref = - 1;
     while (has_ref) {
         int got_symbols = 0;
-        while (~ ds.slice_data_empty?()) { ;; change to slice_bits()
+        while ((~ ds.slice_data_empty?()) & (got_symbols < max_symbols)) { ;; change to slice_bits()
             int bits = ds.slice_bits();
             if (bits >= 8) {
                 int letter = ds~load_uint(8);
