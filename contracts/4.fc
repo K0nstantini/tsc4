@@ -23,7 +23,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
     int has_ref = - 1;
     while (has_ref) {
-        while (~ ds.slice_data_empty?()) {
+        while (~ ds.slice_data_empty?()) { ;; change to slice_bits()
             int letter = ds~load_uint(8);
             int new_letter = letter;
 
@@ -38,21 +38,16 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
                 new_letter = (new_letter + shift) % 26;
                 new_letter += 97;
             }
-
-;;             if ((letter >= 65) & (letter <= 122) & ((letter <= 90) | (letter >= 97))) {
-;;                 new_letter -= letter <= 90 ? 65 : 71;
-;;                 new_letter = (new_letter + shift) % 52;
-;;                 new_letter += new_letter <= 25 ? 65 : 71;
-;;             }
+            ;
             cur_builder~store_uint(new_letter, 8);
         }
         builders~tpush(cur_builder);
 
-        if (ds.slice_refs()) {
+        if (ds.slice_refs_empty?()) {
+            has_ref = 0;
+        } else {
             ds = ds~load_ref().begin_parse();
             cur_builder = begin_cell();
-        } else {
-            has_ref = 0;
         }
     }
 
@@ -62,7 +57,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     int count = builders.tlen();
     repeat (count) {
         value = builders~tpop();
-        dc = value .store_ref(dc) .end_cell();
+        dc = value.store_ref(dc).end_cell();
     }
 
     return dc;
