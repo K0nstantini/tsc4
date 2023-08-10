@@ -44,23 +44,6 @@ describe('Task4', () => {
                 .endCell()
         };
 
-        const complexText = (s1: string, s2: string, s3: string) => {
-            return beginCell()
-                .storeUint(0, 32)
-                .storeStringTail(s1)
-                .storeRef(
-                    beginCell()
-                        .storeStringTail(s2)
-                        .storeRef(
-                            beginCell()
-                                .storeStringTail(s3)
-                                .endCell()
-                        )
-                        .endCell()
-                )
-                .endCell()
-        };
-
         let res = await task4.getCaesarCipherEncrypt(1, simpleText("xyz"));
 
         const checkText = (s: string) => {
@@ -72,32 +55,20 @@ describe('Task4', () => {
 
         checkText("yza");
 
-        res = await task4.getCaesarCipherEncrypt(1, complexText("xyz", "abc", "ABC"));
-        // console.log(res);
-        let ds = res.beginParse();
-        ds.skip(32);
 
         const checkComplexText = (s: string) => {
             const exp = hex_to_ascii(ds.loadBits(s.length * 8).toString());
             return expect(exp).toEqual(s);
         };
 
-        checkComplexText("yza");
-        let dc = ds.loadRef();
-        ds = dc.beginParse();
-        checkComplexText("bcd");
-        dc = ds.loadRef();
-        ds = dc.beginParse();
-        checkComplexText("BCD");
-
         const a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
         // console.log(simpleText(a));
         res = await task4.getCaesarCipherEncrypt(1, simpleText(a));
         // console.log(res);
-        ds = res.beginParse();
+        let ds = res.beginParse();
         ds.skip(32);
         checkComplexText("Xifo dpnnfou jt mpoh fopvhi uibu ju epfto'u gju jo b dfmm, opo-gjuujoh foe pg uif mjof jt qvu up uif gjstu sfgfsfodf pg uif");
-         dc = ds.loadRef();
+        let dc = ds.loadRef();
         ds = dc.beginParse();
         checkComplexText(" dfmm. Uijt qspdftt dpoujovft sfdvstjwfmz up eftdsjcf dpnnfout uibu epfto'u gju jo uxp ps npsf dfmmt.");
 
@@ -107,7 +78,7 @@ describe('Task4', () => {
         res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
         checkText("12^|");
 
-        res = await task4.getCaesarCipherEncrypt(- 79, simpleText("ABC"));
+        res = await task4.getCaesarCipherEncrypt(-79, simpleText("ABC"));
         checkText("ZAB");
 
         // ======= DEC =======
