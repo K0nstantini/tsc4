@@ -71,16 +71,19 @@ describe('Task3', () => {
         let res = await task3.getFindAndReplace(flag, value, list);
         console.log(res);
         let ds = res.beginParse();
-        console.log(ds.remainingBits)
         expect(ds.loadUint(1)).toEqual(1);
-        ds.skip(1018);
-        // expect(ds.loadUint(1018)).toEqual(BigInt(0));
+        for (let n = 0; n < 15; n += 1) {
+            expect(ds.loadUint(64)).toEqual(0);
+        }
+        expect(ds.loadUint(58)).toEqual(0);
         expect(ds.loadUint(4)).toEqual(8);
         ds = ds.loadRef().beginParse();
         console.log(ds.remainingBits)
         expect(ds.loadUint(6)).toEqual(1);
-        ds.skip(135);
-        // expect(ds.loadUint(135)).toEqual(BigInt(0));
+        for (let n = 0; n < 2; n += 1) {
+            expect(ds.loadUint(64)).toEqual(0);
+        }
+        expect(ds.loadUint(7)).toEqual(0);
         expect(ds.loadUint(1)).toEqual(1);
     });
 });

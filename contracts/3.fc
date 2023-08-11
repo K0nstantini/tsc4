@@ -39,10 +39,15 @@ int int_len(int n) inline {
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
+    ;;     ~strdump("Cell");
+    ;;     ~dump(linked_list);
     tuple builders = empty_tuple();
     builder cur_builder = begin_cell();
 
     slice ds = linked_list.begin_parse();
+
+    ;;     ~strdump("Slice");
+    ;;     ~dump(ds);
 
     int flag_len = int_len(flag);
     int value_len = int_len(value);
@@ -55,6 +60,7 @@ int int_len(int n) inline {
     while (has_ref > 0) {
         int bits = ds.slice_bits();
         while (bits >= flag_len) {
+            ;;             ~dump(ds.preload_uint(flag_len));
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
                 if (loaded_bits + value_len <= 1023) {
@@ -65,6 +71,13 @@ int int_len(int n) inline {
                     int right_len = (value_len - left_len);
                     (int left, int right) = break_int(value, value_len, left_len, right_len);
                     cur_builder~store_uint(left, left_len);
+                    ;;                     ~dump(cur_builder);
+                    ;;                     ~dump(cur_builder.builder_bits());
+                    ;;                     ~strdump("Break");
+                    ;;                     ~dump(left);
+                    ;;                     ~dump(left_len);
+                    ;;                     ~dump(right);
+                    ;;                     ~dump(right_len);
 
                     builders~tpush(cur_builder);
                     cur_builder = begin_cell();
@@ -119,6 +132,7 @@ int int_len(int n) inline {
                 }
             }
         } else {
+            cur_builder~store_uint(ds~load_uint(bits), bits);
             ds = remained_slice;
             remained_slice = begin_cell().end_cell().begin_parse();
         }
