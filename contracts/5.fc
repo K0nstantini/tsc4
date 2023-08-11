@@ -13,7 +13,65 @@
   1923063428480944139667114773918309212080528]
 -}
 
+int tlen (tuple t) asm "TLEN";
+forall X -> (tuple) to_tuple (X x) asm "NOP";
+
 () recv_internal() {
+}
+
+int int_len(int n) inline {
+    int len = 0;
+    while (n) {
+        n = n >> 1;
+        len += 1;
+    }
+    return len;
+}
+
+(tuple) matrix_multiplier(tuple matrixA, tuple matrixB) inline {
+    int n = matrixA.tlen();
+    int m = matrixB.tlen();
+    int p = matrixB.first().tlen();
+
+    tuple result = empty_tuple();
+
+    int i_n = 0;
+    while (i_n < n) {
+        tuple new_row = empty_tuple();
+
+        int i_p = 0;
+        while (i_p < p) {
+            int value = 0;
+            int i_m = 0;
+            while (i_m < m) {
+                value += matrixA.at(i_n).at(i_m) * matrixB.at(i_m).at(i_p);
+                i_m += 1;
+            }
+            new_row~tpush(value);
+            i_p += 1;
+        }
+        result~tpush(new_row);
+        i_n += 1;
+    }
+    return result;
+}
+
+int fibo(int n, tuple id, tuple m) inline {
+    tuple result = id;
+
+    slice ds = begin_cell()
+            .store_uint(n, int_len(n))
+            .end_cell()
+            .begin_parse();
+
+    while (~ ds.slice_data_empty?()) {
+        result = matrix_multiplier(result, result);
+        int bit = ds~load_uint(1);
+        if (bit) {
+            result = matrix_multiplier(result, m);
+        }
+    }
+    return result.at(1).at(0);
 }
 
 ;; testable
@@ -24,28 +82,14 @@
         return result;
     }
 
-    (int prev, int next) = (0, 1);
+    tuple id = to_tuple([to_tuple([1, 0]), to_tuple([0, 1])]);
+    tuple m = to_tuple([to_tuple([0, 1]), to_tuple([1, 1])]);
 
-    int save_i = n - 1;
-    int count = k + save_i;
-
-    if (n == 0) {
-        result~tpush(prev);
+    int last = n + k - 1;
+    while (n <= last) {
+        result~tpush(fibo(n, id, m));
+        n += 1;
     }
-
-    int i = 0;
-    while (i < count) {
-        int temp = next;
-        if (i < count - 1) {
-            next = prev + next;
-        }
-        prev = temp;
-        if (i >= save_i) {
-            result~tpush(prev);
-        }
-        i += 1;
-    }
-
     return result;
 }
 

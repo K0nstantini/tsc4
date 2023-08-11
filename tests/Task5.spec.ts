@@ -36,28 +36,28 @@ describe('Task5', () => {
         // blockchain and task5 are ready to use
     });
 
-    // it('should fibonacci sequence', async () => {
-    //     let res = await task5.getFibonacciSequence(1, 3);
-    //
-    //     const checkEq = (n: number) => expect(res.readNumber()).toEqual(n);
-    //
-    //     checkEq(1);
-    //     checkEq(1);
-    //     checkEq(2);
-    //
-    //     res = await task5.getFibonacciSequence(201, 4);
-    //     checkEq(453973694165307953197296969697410619233826);
-    //     checkEq(734544867157818093234908902110449296423351);
-    //     checkEq(1188518561323126046432205871807859915657177);
-    //     checkEq(1923063428480944139667114773918309212080528);
-    //
-    //     res = await task5.getFibonacciSequence(0, 3);
-    //     checkEq(0);
-    //     checkEq(1);
-    //     checkEq(1);
-    //
-    //     res = await task5.getFibonacciSequence(2, 1);
-    //     checkEq(1);
-    //
-    // });
+    it('should fibonacci sequence', async () => {
+        let res = await task5.getFibonacciSequence(1, 3);
+
+        const checkEq = (n: number) => expect(res.readNumber()).toEqual(n);
+
+        checkEq(1);
+        checkEq(1);
+        checkEq(2);
+
+        res = await task5.getFibonacciSequence(201, 4);
+        checkEq(453973694165307953197296969697410619233826);
+        checkEq(734544867157818093234908902110449296423351);
+        checkEq(1188518561323126046432205871807859915657177);
+        checkEq(1923063428480944139667114773918309212080528);
+
+        res = await task5.getFibonacciSequence(0, 3);
+        checkEq(0);
+        checkEq(1);
+        checkEq(1);
+
+        res = await task5.getFibonacciSequence(2, 1);
+        checkEq(1);
+
+    });
 });
