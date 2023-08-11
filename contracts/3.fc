@@ -102,11 +102,13 @@ int int_len(int n) inline {
             } else {
                 slice new_ds = ds~load_ref().begin_parse();
                 int new_bits_len = min(cell_max_bit - bits, new_ds.slice_bits());
-                ds = begin_cell()
+                builder db = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
-                        .store_slice(new_ds~load_bits(new_bits_len))
-                        .end_cell()
-                        .begin_parse();
+                        .store_slice(new_ds~load_bits(new_bits_len));
+                if (new_ds.slice_data_empty?() & ~ new_ds.slice_refs_empty?()) {
+                    db = db.store_ref(new_ds~load_ref());
+                }
+                ds = db.end_cell().begin_parse();
                 next_slice = new_ds;
             }
         } else {

@@ -153,14 +153,6 @@ describe('Task3', () => {
             )
             .endCell();
 
-        // let ds = list.beginParse();
-        // console.log(ds.loadBits(1016).toString());
-        // console.log(getHex(ds));
-        // ds = ds.loadRef().beginParse();
-        // console.log(getHex(ds));
-        // ds = ds.loadRef().beginParse();
-        // console.log(getHex(ds));
-
 
         let res = await task3.getFindAndReplace(flag, value, list);
         let ds = res.beginParse();
@@ -173,11 +165,3 @@ describe('Task3', () => {
         expect(ds.loadBits(232).toString()).toEqual("C96E206FF2646572207C6F2061636869657E65207C6869732067EFE16C");
     });
 });
-
-function getHex(ds: Slice) {
-    let str = '';
-    while (ds.remainingBits >= 8) {
-        str += String.fromCharCode(parseInt(ds.loadBits(8).toString(), 16));
-    }
-    return str;
-}
