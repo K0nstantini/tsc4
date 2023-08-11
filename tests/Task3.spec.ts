@@ -75,6 +75,7 @@ describe('Task3', () => {
         expect(ds.loadUint(58)).toEqual(0);
         expect(ds.loadUint(4)).toEqual(8);
         ds = ds.loadRef().beginParse();
+        console.log(ds.remainingBits);
         expect(ds.loadUint(6)).toEqual(1);
         for (let n = 0; n < 2; n += 1) {
             expect(ds.loadUint(64)).toEqual(0);
