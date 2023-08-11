@@ -6,24 +6,27 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-(int) tlen (tuple t) asm "TLEN";
-forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
+;; (int) tlen (tuple t) asm "TLEN";
+;; forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
+
+forall X -> int is_null (X x) asm "ISNULL";
+forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
+forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+
 
 () recv_internal() {
 }
 
-(cell) cipher(int shift, cell text) impure inline {
+(cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
 
     if (ds.slice_bits() < 32) {
-        throw(0xFFFF);
-;;         return text;
+        return text;
     }
 
     int prefix = ds~load_uint(32);
     if (prefix != 0) {
-        throw(0xFFFF);
-;;         return text;
+        return text;
     }
 
     if (ds.slice_data_empty?() | (shift == 0)) {
@@ -31,13 +34,12 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
 
     if (ds.preload_uint(8) == 0xFF) {
-        throw(0xFFFF);
-;;         return text;
+        return text;
     }
 
     ;;     ds~skip_bits(32);
 
-    tuple builders = empty_tuple();
+    tuple builders = null();
 
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, 32);
@@ -56,7 +58,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
             cur_builder~store_uint(new_letter, 8);
 
         }
-        builders~tpush(cur_builder);
+        builders~push_back(cur_builder);
 
         if (ds.slice_refs_empty?()) {
             has_ref = 0;
@@ -66,12 +68,11 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         }
     }
 
-    builder value = builders~tpop();
+    builder value = builders~pop_back();
     cell dc = value.end_cell();
 
-    int count = builders.tlen();
-    repeat (count) {
-        value = builders~tpop();
+    while (~ builders.is_null()) {
+        value = builders~pop_back();
         dc = value.store_ref(dc).end_cell();
     }
 
