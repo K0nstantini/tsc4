@@ -6,8 +6,6 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-;; (int) tlen (tuple t) asm "TLEN";
-;; forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 forall X -> int is_null (X x) asm "ISNULL";
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
@@ -20,25 +18,7 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
 
-    if (ds.slice_bits() < 32) {
-        return text;
-    }
-
-    int prefix = ds~load_uint(32);
-    if (prefix != 0) {
-        return text;
-    }
-
-    if (ds.slice_data_empty?() | (shift == 0)) {
-        return text;
-    }
-
-    if (ds.preload_uint(8) == 0xFF) {
-        return text;
-    }
-
-    ;;     ds~skip_bits(32);
-
+    ds~skip_bits(32);
     tuple builders = null();
 
     builder cur_builder = begin_cell();
@@ -81,13 +61,11 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-    shift %= 26;
     return cipher(shift, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-    shift %= 26;
     return cipher(- shift, text);
 }
 
