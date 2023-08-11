@@ -14,7 +14,16 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
-    ds~skip_bits(32);
+
+    if (ds.slice_bits() < 32) {
+        return text;
+    }
+
+    int prefix = ds~load_uint(32);
+
+    if (prefix != 0) {
+        return text;
+    }
 
     tuple builders = empty_tuple();
 
@@ -24,20 +33,15 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     int has_ref = 1;
     while (has_ref > 0) {
         while (~ ds.slice_data_empty?()) {
-            int bits = ds.slice_bits();
-            if (bits >= 8) {
-                int letter = ds~load_uint(8);
+            int letter = ds~load_uint(8);
 
-                int new_letter = ((letter >= 65) & (letter <= 90))
-                        ? (letter + shift - 65) % 26 + 65
-                        : ((letter >= 97) & (letter <= 122))
-                        ? (letter + shift - 97) % 26 + 97
-                        : letter;
+            int new_letter = ((letter >= 65) & (letter <= 90))
+                    ? (letter + shift - 65) % 26 + 65
+                    : ((letter >= 97) & (letter <= 122))
+                    ? (letter + shift - 97) % 26 + 97
+                    : letter;
 
-                cur_builder~store_uint(new_letter, 8);
-            } else {
-                cur_builder~store_uint(ds~load_uint(bits), bits);
-            }
+            cur_builder~store_uint(new_letter, 8);
 
         }
         builders~tpush(cur_builder);
