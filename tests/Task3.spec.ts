@@ -37,6 +37,8 @@ describe('Task3', () => {
     });
 
     it('should find and replace', async () => {
+        // ============== 1 ===================================
+
         let flag = 0b100000;
         let value = 0b11111111;
 
@@ -48,6 +50,22 @@ describe('Task3', () => {
         let res = await task3.getFindAndReplace(flag, value, list);
         let ds = res.beginParse();
         expect(ds.loadUint(56)).toEqual(63750508677749621);
+
+        // ============== 2 ===================================
+
+        flag = 0b10;
+         value = 0b11101;
+
+        binary_value = 4498584577343434;
+        list = beginCell()
+            .storeUint(binary_value, 52)
+            .endCell();
+
+        res = await task3.getFindAndReplace(flag, value, list);
+        ds = res.beginParse();
+        expect(ds.loadUint(85)).toEqual(38676032225073898578766781);
+
+        // ============== 3 ===================================
 
         flag = 0b1111111111;
         value = 0b1000000001;
@@ -65,9 +83,13 @@ describe('Task3', () => {
             )
             .endCell();
 
+        // let bits = list.beginParse().loadBits(1023);
+        // console.log(bits.toString());
 
         res = await task3.getFindAndReplace(flag, value, list);
         ds = res.beginParse();
+        // let bits = ds.loadBits(1023);
+        // console.log(bits.toString());
         expect(ds.loadUint(1)).toEqual(1);
         for (let n = 0; n < 15; n += 1) {
             expect(ds.loadUint(64)).toEqual(0);
