@@ -107,8 +107,8 @@ int int_len(int n) inline {
             }
         } else {
             slice new_ds = ds~load_ref().begin_parse();
-            int new_bits_len = min(1023 - bits, new_ds.slice_bits());
             int next_slice_len = next_slice.slice_bits();
+            int new_bits_len = min(1023 - bits - next_slice_len, new_ds.slice_bits());
             ds = begin_cell()
                     .store_uint(ds~load_uint(bits), bits)
                     .store_uint(next_slice~load_uint(next_slice_len), next_slice_len)
