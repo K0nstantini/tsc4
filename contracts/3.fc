@@ -16,8 +16,6 @@
 
 -}
 
-const cell_max_bit = 1016;
-
 (int) tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
@@ -39,7 +37,7 @@ int int_len(int n) inline {
     return (ds~load_uint(left_len), ds~load_uint(right_len));
 }
 
-(builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len) inline {
+(builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len, int cell_max_bit) inline {
     if (value_len) {
         if (loaded_bits + value_len <= cell_max_bit) {
             b~store_uint(value, value_len);
@@ -66,6 +64,8 @@ int int_len(int n) inline {
 
     slice ds = linked_list.begin_parse();
 
+    int cell_max_bit = ds.slice_bits();
+
     int flag_len = int_len(flag);
     int value_len = int_len(value);
 
@@ -78,7 +78,7 @@ int int_len(int n) inline {
         while (bits >= flag_len) {
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
-                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len);
+                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len, cell_max_bit);
                 bits -= flag_len;
             } else {
                 cur_builder~store_uint(ds~load_uint(1), 1);
@@ -94,7 +94,7 @@ int int_len(int n) inline {
 
         if (next_slice.slice_data_empty?()) {
             if (ds.slice_refs_empty?()) {
-                (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits);
+                (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
                 if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
                 }
