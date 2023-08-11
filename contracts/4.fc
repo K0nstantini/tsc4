@@ -41,7 +41,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
     int has_ref = 1;
     while (has_ref > 0) {
-        while (ds.slice_bits() >= 8) {
+        while (~ ds.slice_data_empty?()) {
             int letter = ds~load_uint(8);
 
             int new_letter = ((letter >= 65) & (letter <= 90))
@@ -55,7 +55,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         }
         builders~tpush(cur_builder);
 
-        if (ds.slice_refs_empty?()) {
+        if (ds.slice_refs_empty?() | (cur_builder.builder_bits() < 1016)) {
             has_ref = 0;
         } else {
             ds = ds~load_ref().begin_parse();
