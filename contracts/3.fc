@@ -64,7 +64,7 @@ int int_len(int n) inline {
 
     slice ds = linked_list.begin_parse();
 
-    int cell_max_bit = max(ds.slice_bits(), 1016);
+    int cell_max_bit = 1023;
 
     int flag_len = int_len(flag);
     int value_len = int_len(value);
@@ -119,7 +119,7 @@ int int_len(int n) inline {
             if (~ next_slice.slice_refs_empty?()) {
                 db = db.store_ref(next_slice~load_ref());
             }
-            ds = db.end_cell() .begin_parse();
+            ds = db.end_cell().begin_parse();
         }
     }
 
