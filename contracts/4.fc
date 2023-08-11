@@ -18,6 +18,10 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
 
+    if (ds.slice_data_empty?() | (shift == 0)) {
+        return text;
+    }
+
     ds~skip_bits(32);
     tuple builders = null();
 
