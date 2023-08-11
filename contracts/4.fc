@@ -16,13 +16,18 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 }
 
 (cell) cipher(int shift, cell text) inline {
+    shift %= 26;
+
     slice ds = text.begin_parse();
+    ds~skip_bits(32);
 
     if (ds.slice_data_empty?() | (shift == 0)) {
         return text;
     }
 
-    ds~skip_bits(32);
+    int shift_upper = shift - 65;
+    int shift_low = shift - 97;
+
     tuple builders = null();
 
     builder cur_builder = begin_cell();
@@ -34,9 +39,9 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
             int letter = ds~load_uint(8);
 
             int new_letter = ((letter >= 65) & (letter <= 90))
-                    ? (letter + shift - 65) % 26 + 65
+                    ? (letter + shift_upper) % 26 + 65
                     : ((letter >= 97) & (letter <= 122))
-                    ? (letter + shift - 97) % 26 + 97
+                    ? (letter + shift_low) % 26 + 97
                     : letter;
 
             cur_builder~store_uint(new_letter, 8);
