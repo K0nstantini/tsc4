@@ -16,6 +16,14 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     slice ds = text.begin_parse();
     ds~skip_bits(32);
 
+    if  (ds.slice_empty?()) {
+        return text;
+    }
+
+    if (ds.preload_uint(8) == 0xFF) {
+        return text;
+    }
+
     tuple builders = empty_tuple();
 
     builder cur_builder = begin_cell();
@@ -35,15 +43,13 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
             cur_builder~store_uint(new_letter, 8);
 
         }
-        if (cur_builder.builder_bits() > 0) {
-            builders~tpush(cur_builder);
-            cur_builder = begin_cell();
-        }
+        builders~tpush(cur_builder);
 
         if (ds.slice_refs_empty?()) {
             has_ref = 0;
         } else {
             ds = ds~load_ref().begin_parse();
+            cur_builder = begin_cell();
         }
     }
 

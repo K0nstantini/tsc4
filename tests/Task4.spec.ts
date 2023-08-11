@@ -58,16 +58,20 @@ describe('Task4', () => {
             return expect(exp).toEqual(s);
         };
 
-        let a = "When comment is long enough that it doesn't fit in a cell, non-fitting end of the line is put to the first reference of the cell. This process continues recursively to describe comments that doesn't fit in two or more cells.";
-        // console.log(simpleText(a));
-        res = await task4.getCaesarCipherEncrypt(-25, simpleText(a));
-        // console.log(res);
+        let a = "For instance, users may indicate the purpose of a simple transfer from their wallet to the wallet of another user in this text field. On the other hand, if the comment begins with the byte 0xff, the remainder is a \"binary comment\", which should not be displayed to the end user as text (only as a hex dump if necessary). The intended use of \"binary comments\" is, e.g., to contain a purchase identifier for payments in a store, to be automatically generated and processed by the store's software.";
+        res = await task4.getCaesarCipherEncrypt(3, simpleText(a));
         ds = res.beginParse();
         ds.skip(32);
-        checkComplexText("Xifo dpnnfou jt mpoh fopvhi uibu ju epfto'u gju jo b dfmm, opo-gjuujoh foe pg uif mjof jt qvu up uif gjstu sfgfsfodf pg uif");
+        checkComplexText("Iru lqvwdqfh, xvhuv pdb lqglfdwh wkh sxusrvh ri d vlpsoh wudqvihu iurp wkhlu zdoohw wr wkh zdoohw ri dqrwkhu xvhu lq wklv w");
         let dc = ds.loadRef();
         ds = dc.beginParse();
-        checkComplexText(" dfmm. Uijt qspdftt dpoujovft sfdvstjwfmz up eftdsjcf dpnnfout uibu epfto'u gju jo uxp ps npsf dfmmt.");
+        checkComplexText("haw ilhog. Rq wkh rwkhu kdqg, li wkh frpphqw ehjlqv zlwk wkh ebwh 0aii, wkh uhpdlqghu lv d \"elqdub frpphqw\", zklfk vkrxog qrw e");
+         dc = ds.loadRef();
+        ds = dc.beginParse();
+        checkComplexText("h glvsodbhg wr wkh hqg xvhu dv whaw (rqob dv d kha gxps li qhfhvvdub). Wkh lqwhqghg xvh ri \"elqdub frpphqwv\" lv, h.j., wr frqwd");
+        dc = ds.loadRef();
+        ds = dc.beginParse();
+        checkComplexText("lq d sxufkdvh lghqwlilhu iru sdbphqwv lq d vwruh, wr eh dxwrpdwlfdoob jhqhudwhg dqg surfhvvhg eb wkh vwruh'v vriwzduh.");
 
         res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
         checkText("12^|");
