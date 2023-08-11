@@ -64,7 +64,7 @@ int int_len(int n) inline {
 
     slice ds = linked_list.begin_parse();
 
-    int cell_max_bit = ds.slice_bits();
+    int cell_max_bit = max(ds.slice_bits(), 1016);
 
     int flag_len = int_len(flag);
     int value_len = int_len(value);

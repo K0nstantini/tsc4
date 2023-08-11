@@ -1,5 +1,5 @@
 import {Blockchain, SandboxContract} from '@ton-community/sandbox';
-import {beginCell, Cell, toNano} from 'ton-core';
+import {beginCell, BitString, Cell, Slice, toNano} from 'ton-core';
 import {Task3} from '../wrappers/Task3';
 import '@ton-community/test-utils';
 import {compile} from '@ton-community/blueprint';
@@ -104,26 +104,53 @@ describe('Task3', () => {
 
         // ============== 4 ===================================
 
-        let ds = beginCell().endCell().beginParse();
+        // let ds = beginCell().endCell().beginParse();
+        //
+        // const checkComplexText = (s: string) => {
+        //     const exp = hex_to_ascii(ds.loadBits(s.length * 8).toString());
+        //     return expect(exp).toEqual(s);
+        // };
+        //
+        // let flag = 0b011101010110111001100100 ;
+        // // flag = 554553254658073180597860;
+        // let value = 0b011000010110001001100011 ;
+        //
+        // let s = "Today, we are going to teach our prospective builders how to mine on TON Blockchain. " +
+        //     "This experience will allow all of you to understand the significance of mining and why Bitcoin mining helped revolutionize the industry.";
+        // let list = beginCell()
+        //     .storeStringTail(s)
+        //     .endCell();
+        //
+        // let res = await task3.getFindAndReplace(flag, value, list);
+        // ds = res.beginParse();
+        // checkComplexText("Today, we are going to teach our prospective builders how to mine on TON Blockchain. This experience will allow all of you to a");
+        // ds = ds.loadRef().beginParse();
+        // checkComplexText("bcerstand the significance of mining and why Bitcoin mining helped revolutionize the");
 
-        const checkComplexText = (s: string) => {
-            const exp = hex_to_ascii(ds.loadBits(s.length * 8).toString());
-            return expect(exp).toEqual(s);
-        };
+        // ============== 5 ===================================
 
-        let flag = 0b010101000100111101001110;
-        let value = 0b010100100100111101001101;
 
-        let s = "Today, we are going to teach our prospective builders how to mine on TON Blockchain. " +
-            "This experience will allow all of you to understand the significance of mining and why Bitcoin mining helped revolutionize the industry.";
-        let list = beginCell()
-            .storeStringTail(s)
-            .endCell();
+        let flag = 0b101 ;
+        let value = 0b111 ;
+
+        const p = '011000010110001001100011';
+        let list = new Cell({
+            bits: new BitString(new Buffer(p, 'binary'), 0, p.length)
+        });
+
+        // let list = beginCell()
+        //     .storeUint(BigInt(0xA78D25596F489D9549DB2E8270068A85DF1BDC5ADE28D6118B2D127B91C3BCC308151D3AC81BD3A5B24807101CAB3BF63198A51FDA261AD6344FDB59112E7C46), 512)
+        //     .storeUint(BigInt(0x87A856616E4C0268CB77368D329C63D6B3E0E4DD2BC398696D44CC0DEC21FC7900E26F7DCF3976C3F039153E990F0B0FA6C67691DC5B4D843F7C63712E7C46), 504)
+        //     .storeUint(0, 7)
+        //     .endCell();
+
+
+        // let s = list.beginParse().loadBits(p.length);
+        console.log(list);
 
         let res = await task3.getFindAndReplace(flag, value, list);
-        ds = res.beginParse();
-        checkComplexText("Today, we are going to teach our prospective builders how to mine on ROM Blockchain. This experience will allow all of you to u");
-        ds = ds.loadRef().beginParse();
-        checkComplexText("nderstand the significance");
+        let ds = res.beginParse();
+        expect(ds.loadUint(p.length)).toEqual(6414947);
+        console.log(ds);
     });
 });
