@@ -78,7 +78,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
     shift %= 26;
-    return cipher(shift, text);
+    return cipher(- shift, text);
 }
 
 ;; testable
