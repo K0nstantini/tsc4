@@ -60,10 +60,6 @@ int int_len(int n) inline {
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
 
-    if ((flag <= 0) | (value <= 0)) {
-        return linked_list;
-    }
-
     tuple builders = empty_tuple();
     builder cur_builder = begin_cell();
 
@@ -138,6 +134,5 @@ int int_len(int n) inline {
     }
 
     return dc;
-    return begin_cell().end_cell();
 }
 
