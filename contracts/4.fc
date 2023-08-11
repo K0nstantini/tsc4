@@ -16,12 +16,12 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     slice ds = text.begin_parse();
 
     if (ds.slice_bits() < 32) {
-        throw(0xFFFF);
+        return text;
     }
 
     int prefix = ds~load_uint(32);
     if (prefix != 0) {
-        throw(0xFFFF);
+        return text;
     }
 
     if (ds.slice_empty?() | (shift == 0)) {
@@ -29,7 +29,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
 
     if (ds.preload_uint(8) == 0xFF) {
-        throw(0xFFFF);
+        return text;
     }
 
     ;;     ds~skip_bits(32);
@@ -41,7 +41,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
     int has_ref = 1;
     while (has_ref > 0) {
-        while (~ ds.slice_data_empty?()) {
+        while (ds.slice_bits() >= 8) {
             int letter = ds~load_uint(8);
 
             int new_letter = ((letter >= 65) & (letter <= 90))
