@@ -12,16 +12,18 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 () recv_internal() {
 }
 
-(cell) cipher(int shift, cell text) inline {
+(cell) cipher(int shift, cell text) impure inline {
     slice ds = text.begin_parse();
 
     if (ds.slice_bits() < 32) {
-        return text;
+        throw(0xFFFF);
+;;         return text;
     }
 
     int prefix = ds~load_uint(32);
     if (prefix != 0) {
-        return text;
+        throw(0xFFFF);
+;;         return text;
     }
 
     if (ds.slice_data_empty?() | (shift == 0)) {
@@ -29,7 +31,8 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
 
     if (ds.preload_uint(8) == 0xFF) {
-        return text;
+        throw(0xFFFF);
+;;         return text;
     }
 
     ;;     ds~skip_bits(32);
@@ -78,7 +81,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
     shift %= 26;
-    return cipher(- shift, text);
+    return cipher(shift, text);
 }
 
 ;; testable
