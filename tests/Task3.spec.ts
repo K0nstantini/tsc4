@@ -1,5 +1,5 @@
 import {Blockchain, SandboxContract} from '@ton-community/sandbox';
-import {beginCell, BitString, Cell, toNano} from 'ton-core';
+import {beginCell, Cell, toNano} from 'ton-core';
 import {Task3} from '../wrappers/Task3';
 import '@ton-community/test-utils';
 import {compile} from '@ton-community/blueprint';
@@ -45,14 +45,13 @@ describe('Task3', () => {
             .storeUint(binary_value, 52)
             .endCell();
 
-        // let res = await task3.getFindAndReplace(flag, value, list);
-        // let ds = res.beginParse();
-        // expect(ds.loadUint(56)).toEqual(63750508677749621);
+        let res = await task3.getFindAndReplace(flag, value, list);
+        let ds = res.beginParse();
+        expect(ds.loadUint(56)).toEqual(63750508677749621);
 
         flag = 0b1111111111;
         value = 0b1000000001;
 
-        // let binary_value_big = BigInt("250561853410701596557444684673866657010220293093133512909600348450487082172792661286038994690695052461325699100153893054646104098222228073063766494782302722810120081291184627929537671974977349220810968318532927168872930418994518829420741149312204893572709752708607032818175191464000110584271035222302421964735705239567737021531617822196063138473836545");
         list = beginCell()
             .storeUint(1, 1)
             .storeUint(0, 1018)
@@ -66,11 +65,9 @@ describe('Task3', () => {
             )
             .endCell();
 
-        console.log(list);
 
-        let res = await task3.getFindAndReplace(flag, value, list);
-        console.log(res);
-        let ds = res.beginParse();
+        res = await task3.getFindAndReplace(flag, value, list);
+        ds = res.beginParse();
         expect(ds.loadUint(1)).toEqual(1);
         for (let n = 0; n < 15; n += 1) {
             expect(ds.loadUint(64)).toEqual(0);
@@ -78,7 +75,6 @@ describe('Task3', () => {
         expect(ds.loadUint(58)).toEqual(0);
         expect(ds.loadUint(4)).toEqual(8);
         ds = ds.loadRef().beginParse();
-        console.log(ds.remainingBits)
         expect(ds.loadUint(6)).toEqual(1);
         for (let n = 0; n < 2; n += 1) {
             expect(ds.loadUint(64)).toEqual(0);
