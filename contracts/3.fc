@@ -16,6 +16,8 @@
 
 -}
 
+const cell_max_bit = 1016;
+
 (int) tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
@@ -39,11 +41,11 @@ int int_len(int n) inline {
 
 (builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len) inline {
     if (value_len) {
-        if (loaded_bits + value_len <= 1023) {
+        if (loaded_bits + value_len <= cell_max_bit) {
             b~store_uint(value, value_len);
             loaded_bits += value_len;
         } else {
-            int left_len = (1023 - loaded_bits);
+            int left_len = (cell_max_bit - loaded_bits);
             int right_len = (value_len - left_len);
             (int left, int right) = break_int(value, value_len, left_len, right_len);
             b~store_uint(left, left_len);
@@ -83,7 +85,7 @@ int int_len(int n) inline {
                 loaded_bits += 1;
                 bits -= 1;
             }
-            if (loaded_bits == 1023) {
+            if (loaded_bits == cell_max_bit) {
                 builders~tpush(cur_builder);
                 cur_builder = begin_cell();
                 loaded_bits = 0;
@@ -99,7 +101,7 @@ int int_len(int n) inline {
                 has_ref = 0;
             } else {
                 slice new_ds = ds~load_ref().begin_parse();
-                int new_bits_len = min(1023 - bits, new_ds.slice_bits());
+                int new_bits_len = min(cell_max_bit - bits, new_ds.slice_bits());
                 ds = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
                         .store_slice(new_ds~load_bits(new_bits_len))

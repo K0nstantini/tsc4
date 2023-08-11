@@ -111,16 +111,19 @@ describe('Task3', () => {
             return expect(exp).toEqual(s);
         };
 
-        let flag = 0b0110011101101111011010010110111001100111 ;
-        let value = 0b0110011101101111;
+        let flag = 0b010101000100111101001110;
+        let value = 0b010100100100111101001101;
 
-        let s = "Today, we are going to teach our prospective builders how to mine on TON Blockchain. This experience will allow all of you to understand the significance of mining and why Bitcoin mining helped revolutionize the industry.";
+        let s = "Today, we are going to teach our prospective builders how to mine on TON Blockchain. " +
+            "This experience will allow all of you to understand the significance of mining and why Bitcoin mining helped revolutionize the industry.";
         let list = beginCell()
             .storeStringTail(s)
             .endCell();
 
         let res = await task3.getFindAndReplace(flag, value, list);
         ds = res.beginParse();
-        checkComplexText("Today, we are go to");
+        checkComplexText("Today, we are going to teach our prospective builders how to mine on ROM Blockchain. This experience will allow all of you to u");
+        ds = ds.loadRef().beginParse();
+        checkComplexText("nderstand the significance");
     });
 });
