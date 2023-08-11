@@ -111,11 +111,13 @@ int int_len(int n) inline {
             }
         } else {
             int next_slice_len = next_slice.slice_bits();
-            ds = begin_cell()
+            builder db = begin_cell()
                     .store_uint(ds~load_uint(bits), bits)
-                    .store_slice(next_slice~load_bits(next_slice_len))
-                    .end_cell()
-                    .begin_parse();
+                    .store_slice(next_slice~load_bits(next_slice_len));
+            if (~ next_slice.slice_refs_empty?()) {
+                db = db.store_ref(next_slice~load_ref());
+            }
+            ds = db.end_cell() .begin_parse();
         }
     }
 
