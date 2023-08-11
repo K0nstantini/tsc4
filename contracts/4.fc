@@ -13,6 +13,8 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 }
 
 (cell) cipher(int shift, cell text) inline {
+    shift = shift % 26;
+
     slice ds = text.begin_parse();
 
     if (ds.slice_bits() < 32) {
@@ -55,7 +57,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         }
         builders~tpush(cur_builder);
 
-        if (ds.slice_refs_empty?() | (cur_builder.builder_bits() < 1016)) {
+        if (ds.slice_refs_empty?()) {
             has_ref = 0;
         } else {
             ds = ds~load_ref().begin_parse();

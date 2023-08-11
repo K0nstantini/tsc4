@@ -74,6 +74,13 @@ describe('Task4', () => {
         checkComplexText("lq d sxufkdvh lghqwlilhu iru sdbphqwv lq d vwruh, wr eh dxwrpdwlfdoob jhqhudwhg dqg surfhvvhg eb wkh vwruh'v vriwzduh.");
         expect(ds.remainingBits).toEqual(0);
 
+        a = "FOR INSTANCE, USERS MAY INDICATE THE PURPOSE OF A SIMPLE TRANSFER";
+        res = await task4.getCaesarCipherEncrypt(21, simpleText(a));
+        ds = res.beginParse();
+        ds.skip(32);
+        checkComplexText("AJM DINOVIXZ, PNZMN HVT DIYDXVOZ OCZ KPMKJNZ JA V NDHKGZ OMVINAZM");
+        expect(ds.remainingBits).toEqual(0);
+
         res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
         checkText("12^|");
 
@@ -92,6 +99,13 @@ describe('Task4', () => {
         dc = ds.loadRef();
         ds = dc.beginParse();
         checkComplexText(" cell. This process continues recursively to describe comments that doesn't fit in two or more cells.");
+        expect(ds.remainingBits).toEqual(0);
+
+        a = "AJM DINOVIXZ, PNZMN HVT DIYDXVOZ OCZ KPMKJNZ JA V NDHKGZ OMVINAZM";
+        res = await task4.getCaesarCipherDecrypt(21, simpleText(a));
+        ds = res.beginParse();
+        ds.skip(32);
+        checkComplexText("FOR INSTANCE, USERS MAY INDICATE THE PURPOSE OF A SIMPLE TRANSFER");
         expect(ds.remainingBits).toEqual(0);
 
     });
