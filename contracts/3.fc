@@ -37,13 +37,13 @@ int int_len(int n) inline {
     return (ds~load_uint(left_len), ds~load_uint(right_len));
 }
 
-(builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len, int cell_max_bit) inline {
+(builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len) inline {
     if (value_len) {
-        if (loaded_bits + value_len <= cell_max_bit) {
+        if (loaded_bits + value_len <= 1023) {
             b~store_uint(value, value_len);
             loaded_bits += value_len;
         } else {
-            int left_len = (cell_max_bit - loaded_bits);
+            int left_len = (1023 - loaded_bits);
             int right_len = (value_len - left_len);
             (int left, int right) = break_int(value, value_len, left_len, right_len);
             b~store_uint(left, left_len);
@@ -59,17 +59,13 @@ int int_len(int n) inline {
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
-
-    tuple builders = empty_tuple();
-    builder cur_builder = begin_cell();
-
     slice ds = linked_list.begin_parse();
-
     if (ds.slice_data_empty?()) {
         return linked_list;
     }
 
-    int cell_max_bit = 1023;
+    tuple builders = empty_tuple();
+    builder cur_builder = begin_cell();
 
     int flag_len = int_len(flag);
     int value_len = int_len(value);
@@ -83,14 +79,14 @@ int int_len(int n) inline {
         while (bits >= flag_len) {
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
-                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len, cell_max_bit);
+                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len);
                 bits -= flag_len;
             } else {
                 cur_builder~store_uint(ds~load_uint(1), 1);
                 loaded_bits += 1;
                 bits -= 1;
             }
-            if (loaded_bits == cell_max_bit) {
+            if (loaded_bits == 1023) {
                 builders~tpush(cur_builder);
                 cur_builder = begin_cell();
                 loaded_bits = 0;
@@ -99,14 +95,14 @@ int int_len(int n) inline {
 
         if (next_slice.slice_data_empty?()) {
             if (ds.slice_refs_empty?()) {
-                (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
+                (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits);
                 if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
                 }
                 has_ref = 0;
             } else {
                 slice new_ds = ds~load_ref().begin_parse();
-                int new_bits_len = min(cell_max_bit - bits, new_ds.slice_bits());
+                int new_bits_len = min(1023 - bits, new_ds.slice_bits());
                 builder db = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
                         .store_slice(new_ds~load_bits(new_bits_len));

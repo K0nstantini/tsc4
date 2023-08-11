@@ -13,7 +13,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 }
 
 (cell) cipher(int shift, cell text) inline {
-    shift = shift % 26;
+    shift %= 26;
 
     slice ds = text.begin_parse();
 
@@ -26,7 +26,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         return text;
     }
 
-    if (ds.slice_empty?() | (shift == 0)) {
+    if (ds.slice_data_empty?() | (shift == 0)) {
         return text;
     }
 

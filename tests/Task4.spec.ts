@@ -81,8 +81,8 @@ describe('Task4', () => {
         checkComplexText("AJM DINOVIXZ, PNZMN HVT DIYDXVOZ OCZ KPMKJNZ JA V NDHKGZ OMVINAZM");
         expect(ds.remainingBits).toEqual(0);
 
-        res = await task4.getCaesarCipherEncrypt(1, simpleText("12^|"));
-        checkText("12^|");
+        res = await task4.getCaesarCipherEncrypt(1, simpleText("?@[`{"));
+        checkText("?@[`{");
 
         res = await task4.getCaesarCipherEncrypt(-79, simpleText(""));
         checkText("");
