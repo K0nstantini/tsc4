@@ -13,8 +13,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 }
 
 (cell) cipher(int shift, cell text) inline {
-    shift %= 26;
-
     slice ds = text.begin_parse();
 
     if (ds.slice_bits() < 32) {
@@ -79,11 +77,13 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
+    shift %= 26;
     return cipher(shift, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-    return cipher(shift, text);
+    shift %= 26;
+    return cipher(- shift, text);
 }
 
