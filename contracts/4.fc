@@ -14,16 +14,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
-
-    if (ds.slice_bits() < 32) {
-        return text;
-    }
-
-    int prefix = ds~load_uint(32);
-
-    if (prefix != 0) {
-        return text;
-    }
+    ds~skip_bits(32);
 
     tuple builders = empty_tuple();
 
@@ -44,13 +35,15 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
             cur_builder~store_uint(new_letter, 8);
 
         }
-        builders~tpush(cur_builder);
+        if (cur_builder.builder_bits() > 0) {
+            builders~tpush(cur_builder);
+            cur_builder = begin_cell();
+        }
 
         if (ds.slice_refs_empty?()) {
             has_ref = 0;
         } else {
             ds = ds~load_ref().begin_parse();
-            cur_builder = begin_cell();
         }
     }
 
