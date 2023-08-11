@@ -71,13 +71,6 @@ int int_len(int n) inline {
                     int right_len = (value_len - left_len);
                     (int left, int right) = break_int(value, value_len, left_len, right_len);
                     cur_builder~store_uint(left, left_len);
-                    ;;                     ~dump(cur_builder);
-                    ;;                     ~dump(cur_builder.builder_bits());
-                    ;;                     ~strdump("Break");
-                    ;;                     ~dump(left);
-                    ;;                     ~dump(left_len);
-                    ;;                     ~dump(right);
-                    ;;                     ~dump(right_len);
 
                     builders~tpush(cur_builder);
                     cur_builder = begin_cell();
@@ -132,7 +125,18 @@ int int_len(int n) inline {
                 }
             }
         } else {
-            cur_builder~store_uint(ds~load_uint(bits), bits);
+            if (loaded_bits + bits <= 1023) {
+                cur_builder~store_uint(ds~load_uint(bits), bits);
+            } else {
+                int left_len = (1023 - loaded_bits);
+                int right_len = (bits - left_len);
+                (int left, int right) = break_int(ds~load_uint(bits), bits, left_len, right_len);
+                cur_builder~store_uint(left, left_len);
+
+                builders~tpush(cur_builder);
+                cur_builder = begin_cell();
+                cur_builder~store_uint(right, right_len);
+            }
             ds = remained_slice;
             remained_slice = begin_cell().end_cell().begin_parse();
         }
