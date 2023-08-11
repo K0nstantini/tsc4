@@ -14,15 +14,25 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 (cell) cipher(int shift, cell text) inline {
     slice ds = text.begin_parse();
-    ds~skip_bits(32);
 
-    if  (ds.slice_empty?()) {
+    if (ds.slice_bits() < 32) {
+        throw(0xFFFF);
+    }
+
+    int prefix = ds~load_uint(32);
+    if (prefix != 0) {
+        throw(0xFFFF);
+    }
+
+    if (ds.slice_empty?() | (shift == 0)) {
         return text;
     }
 
     if (ds.preload_uint(8) == 0xFF) {
-        return text;
+        throw(0xFFFF);
     }
+
+    ;;     ds~skip_bits(32);
 
     tuple builders = empty_tuple();
 
