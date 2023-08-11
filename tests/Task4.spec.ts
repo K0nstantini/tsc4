@@ -94,7 +94,7 @@ describe('Task4', () => {
     });
 });
 
-function hex_to_ascii(hex: string) {
+export function hex_to_ascii(hex: string) {
     let str = '';
     for (let n = 0; n < hex.length; n += 2) {
         str += String.fromCharCode(parseInt(hex.substring(n, n + 2), 16));

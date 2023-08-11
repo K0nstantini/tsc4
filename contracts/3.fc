@@ -102,7 +102,7 @@ int int_len(int n) inline {
                 int new_bits_len = min(1023 - bits, new_ds.slice_bits());
                 ds = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
-                        .store_uint(new_ds~load_uint(new_bits_len), new_bits_len)
+                        .store_slice(new_ds~load_bits(new_bits_len))
                         .end_cell()
                         .begin_parse();
                 next_slice = new_ds;
@@ -111,38 +111,10 @@ int int_len(int n) inline {
             int next_slice_len = next_slice.slice_bits();
             ds = begin_cell()
                     .store_uint(ds~load_uint(bits), bits)
-                    .store_uint(next_slice~load_uint(next_slice_len), next_slice_len)
+                    .store_slice(next_slice~load_bits(next_slice_len))
                     .end_cell()
                     .begin_parse();
         }
-
-        ;;         if (ds.slice_refs_empty?()) {
-        ;;             if (next_slice.slice_data_empty?()) {
-        ;;                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits);
-        ;;                 if (cur_builder.builder_bits()) {
-        ;;                     builders~tpush(cur_builder);
-        ;;                 }
-        ;;                 has_ref = 0;
-        ;;             } else {
-        ;;                 int next_slice_len = next_slice.slice_bits();
-        ;;                 ds = begin_cell()
-        ;;                         .store_uint(ds~load_uint(bits), bits)
-        ;;                         .store_uint(next_slice~load_uint(next_slice_len), next_slice_len)
-        ;;                         .end_cell()
-        ;;                         .begin_parse();
-        ;;             }
-        ;;         } else {
-        ;;             slice new_ds = ds~load_ref().begin_parse();
-        ;;             int next_slice_len = next_slice.slice_bits();
-        ;;             int new_bits_len = min(1023 - bits - next_slice_len, new_ds.slice_bits());
-        ;;             ds = begin_cell()
-        ;;                     .store_uint(ds~load_uint(bits), bits)
-        ;;                     .store_uint(next_slice~load_uint(next_slice_len), next_slice_len)
-        ;;                     .store_uint(new_ds~load_uint(new_bits_len), new_bits_len)
-        ;;                     .end_cell()
-        ;;                     .begin_parse();
-        ;;             next_slice = new_ds;
-        ;;         }
     }
 
     builder value = builders~tpop();
@@ -155,5 +127,6 @@ int int_len(int n) inline {
     }
 
     return dc;
+    return begin_cell().end_cell();
 }
 
