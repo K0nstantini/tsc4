@@ -20,24 +20,25 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
     tuple stack = null();
     stack~push_back(tree);
 
+    int refs = tree.cell_depth();
+
     while (~ stack.is_null()) {
         cell c = stack~pop_back();
         if (c.cell_hash() == hash) {
             return c;
         }
         slice s = c.begin_parse();
-
-        int refs = s.slice_refs();
-        if (refs > 0) {
-            if (refs == 1) {
-                stack~push_back(s~load_ref());
-            } else {
-                cell temp_cell = s~load_ref();
-                repeat (refs - 1) {
-                    stack~push_back(s~load_ref());
+        if (c.cell_depth() == 1) {
+            repeat (s.slice_refs()) {
+                cell c = s~load_ref();
+                if (c.cell_hash() == hash) {
+                    return c;
                 }
-                stack~push_back(temp_cell);
             }
+            return begin_cell().end_cell();
+        }
+        repeat (s.slice_refs()) {
+            stack~push_back(s~load_ref());
         }
     }
     return begin_cell().end_cell();
