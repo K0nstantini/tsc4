@@ -52,6 +52,7 @@ describe('Task1', () => {
             .storeRef(targetCell2)
             .endCell();
 
+
         const wrongTarget = beginCell()
             .storeUint(11, 32)
             .endCell();
