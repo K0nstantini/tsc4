@@ -14,8 +14,6 @@
 ;;         -}
 
 
-(int) tlast (tuple t) asm "LAST";
-
 () recv_internal() {
 }
 
@@ -72,7 +70,7 @@ int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, in
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
 
-    int n_for_classic = 40;
+    int n_for_classic = 30;
 
     (int prev, int next) = n < n_for_classic
             ? classic_fib(n + 1)
@@ -92,11 +90,9 @@ int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, in
     result~tpush(next);
 
     repeat (k - 2) {
-;;         int temp = next;
-;;         next = prev + next;
-;;         prev = temp;
-        next = prev + result.tlast();
-        prev = result.tlast();
+        int temp = next;
+        next = prev + next;
+        prev = temp;
         result~tpush(next);
     }
 
