@@ -41,7 +41,7 @@
     return (y11, y12, y21, y22);
 }
 
-int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) {
+int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
     if (n == 370) {
         return 94611056096305838013295371573764256526437182762229865607320618320601813254535;
     }
@@ -71,7 +71,7 @@ int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, in
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
 
-    int n_for_classic = 80;
+    int n_for_classic = 60;
 
     (int prev, int next) = n < n_for_classic
             ? classic_fib(n + 1)
