@@ -76,6 +76,32 @@ int int_len(int n) inline {
         return result;
     }
 
+
+    if (k > 10) {
+        (int prev, int next) = (0, 1);
+
+        int save_i = n - 1;
+        int count = k + save_i;
+
+        if (n == 0) {
+            result~tpush(prev);
+        }
+
+        int i = 0;
+        while (i < count) {
+            int temp = next;
+            if (i < count - 1) {
+                next = prev + next;
+            }
+            prev = temp;
+            if (i >= save_i) {
+                result~tpush(prev);
+            }
+            i += 1;
+        }
+        return result;
+    }
+
     tuple id = to_tuple([to_tuple([1, 0]), to_tuple([0, 1])]);
     tuple m = to_tuple([to_tuple([0, 1]), to_tuple([1, 1])]);
 
