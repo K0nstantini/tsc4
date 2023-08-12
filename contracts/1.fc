@@ -13,22 +13,17 @@
 () recv_internal() {
 }
 
-(cell, int) check_ref(int hash, cell branch, int success) inline {
-    if (success | (branch.cell_hash() == hash)) {
-        return (branch, 1);
-    }
-    slice ds = branch.begin_parse();
-    repeat (ds.slice_refs()) {
-        (cell c, int success) = check_ref(hash, ds~load_ref(), 0);
-        if (success) {
-            return (c, success);
-        }
-    }
-    return (begin_cell().end_cell(), 0);
-}
-
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    (cell target, _) = check_ref(hash, tree, 0);
-    return target;
+    if (tree.cell_hash() == hash) {
+        return tree;
+    }
+    slice ds = tree.begin_parse();
+    repeat (ds.slice_refs()) {
+        cell c = find_branch_by_hash(hash, ds~load_ref());
+        if (c.cell_hash() == hash) {
+            return c;
+        }
+    }
+    return begin_cell().end_cell();
 }
