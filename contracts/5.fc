@@ -14,95 +14,48 @@
 -}
 
 
-;; forall X -> (tuple) to_tuple (X x) asm "NOP";
-
-;; forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-;; forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
-
 () recv_internal() {
 }
 
-;; int int_len(int n) inline {
-;;     int len = 0;
-;;     while (n) {
-;;         n = n >> 1;
-;;         len += 1;
-;;     }
-;;     return len;
+
+;; (int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
+;;     return (
+;;             a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
+;;             a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
+;;     );
 ;; }
 
-;; (tuple) matrix_multiplier(tuple mA, tuple mB) inline {
-;;     tuple result = empty_tuple();
-;;
-;;     int a1 = mA.at(0).at(0) * mB.at(0).at(0) + mA.at(0).at(1) * mB.at(1).at(0);
-;;     int a2 = mA.at(0).at(0) * mB.at(0).at(1) + mA.at(0).at(1) * mB.at(1).at(1);
-;;     int a3 = mA.at(1).at(0) * mB.at(0).at(0) + mA.at(1).at(1) * mB.at(1).at(0);
-;;     int a4 = mA.at(1).at(0) * mB.at(0).at(1) + mA.at(1).at(1) * mB.at(1).at(1);
-;;
-;;     tuple row = empty_tuple();
-;;     row~tpush(a1);
-;;     row~tpush(a2);
-;;     result~tpush(row);
-;;     tuple row = empty_tuple();
-;;     row~tpush(a3);
-;;     row~tpush(a4);
-;;     result~tpush(row);
-;;
-;;     return result;
-;; }
-
-(int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
-    return (
-            a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
-            a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
-    );
-}
-
-(int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
-    if (n == 0) {
-        return (i11, i12, i21, i22);
-    }
-    if (n == 1) {
-        return (m11, m12, m21, m22);
-    }
-    (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
-    (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
-    if (n % 2) {
-        (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
-    }
-    return (y11, y12, y21, y22);
-}
-
-;; (int) fibo(int n, tuple result, tuple m) inline {
-;;     slice ds = begin_cell()
-;;             .store_uint(n, int_len(n))
-;;             .end_cell()
-;;             .begin_parse();
-;;
-;;     while (~ ds.slice_data_empty?()) {
-;;         result = matrix_multiplier(result, result);
-;;         int bit = ds~load_uint(1);
-;;         if (bit) {
-;;             result = matrix_multiplier(result, m);
-;;         }
-;;     }
-;;     return result.at(1).at(0);
-;; }
-
-;; (tuple) pow(tuple m, int n, tuple id) inline {
+;; (int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
 ;;     if (n == 0) {
-;;         return id;
+;;         return (i11, i12, i21, i22);
 ;;     }
 ;;     if (n == 1) {
-;;         return m;
+;;         return (m11, m12, m21, m22);
 ;;     }
-;;     tuple y = pow(m, n / 2, id);
-;;     y = matrix_multiplier(y, y);
+;;     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
+;;     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
 ;;     if (n % 2) {
-;;         y = matrix_multiplier(m, y);
+;;         (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
 ;;     }
-;;     return y;
+;;     return (y11, y12, y21, y22);
 ;; }
+
+int fib(int n, int r11, int r12, int r21, int r22, int m11, int m12, int m21, int m22) inline {
+    if (n <= 1) {
+        return n;
+    }
+
+    while (n) {
+        if (n % 2) {
+            ;;             (r11, r12, r21, r22) = mul(r11, r12, r21, r22, m11, m12, m21, m22);
+            (r11, r12, r21, r22) = (r11 * m11 + r12 * m21, r11 * m12 + r12 * m22, r21 * m11 + r22 * m21, r21 * m12 + r22 * m22);
+        }
+        n /= 2;
+;;         (m11, m12, m21, m22) = mul(m11, m12, m21, m22, m11, m12, m21, m22);
+        (m11, m12, m21, m22) = (m11 * m11 + m12 * m21, m11 * m12 + m12 * m22, m21 * m11 + m22 * m21, m21 * m12 + m22 * m22);
+    }
+    return r21;
+}
 
 ;; testable
 (tuple) fibonacci_sequence (int n, int k) method_id {
@@ -111,32 +64,31 @@
     if (k == 0) {
         return result;
     }
-
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
 
     if ((n == 369) & (k == 2)) {
-        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
+        int res368 = fib(368, i11, i12, i21, i22, m11, m12, m21, m22);
+        int res369 = fib(369, i11, i12, i21, i22, m11, m12, m21, m22);
         result~tpush(res369);
         result~tpush(res368 + res369);
         return result;
     }
     if (n == 370) {
-        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
+        int res368 = fib(368, i11, i12, i21, i22, m11, m12, m21, m22);
+        int res369 = fib(369, i11, i12, i21, i22, m11, m12, m21, m22);
         result~tpush(res368 + res369);
         return result;
     }
 
-    (_, int prev, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
+    int prev = fib(n, i11, i12, i21, i22, m11, m12, m21, m22);
     result~tpush(prev);
 
     if (k == 1) {
         return result;
     }
 
-    (_, int next, _, _) = pow(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
+    int next = fib(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
     result~tpush(next);
 
     repeat (k - 2) {
@@ -146,30 +98,31 @@
         result~tpush(next);
     }
 
-    ;;     tuple id = to_tuple([to_tuple([1, 0]), to_tuple([0, 1])]);
-    ;;     tuple m = to_tuple([to_tuple([1, 1]), to_tuple([1, 0])]);
+    ;;     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
+    ;;     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
     ;;
     ;;     if ((n == 369) & (k == 2)) {
-    ;;         int res368 = pow(m, 368, id).at(0).at(1);
-    ;;         int res369 = pow(m, 369, id).at(0).at(1);
+    ;;         (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
+    ;;         (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
     ;;         result~tpush(res369);
     ;;         result~tpush(res368 + res369);
     ;;         return result;
     ;;     }
     ;;     if (n == 370) {
-    ;;         int res = pow(m, 368, id).at(0).at(1) + pow(m, 369, id).at(0).at(1);
-    ;;         result~tpush(res);
+    ;;         (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
+    ;;         (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
+    ;;         result~tpush(res368 + res369);
     ;;         return result;
     ;;     }
     ;;
-    ;;     int prev = pow(m, n, id).at(0).at(1);
+    ;;     (_, int prev, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
     ;;     result~tpush(prev);
     ;;
     ;;     if (k == 1) {
     ;;         return result;
     ;;     }
     ;;
-    ;;     int next = pow(m, n + 1, id).at(0).at(1);
+    ;;     (_, int next, _, _) = pow(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
     ;;     result~tpush(next);
     ;;
     ;;     repeat (k - 2) {
