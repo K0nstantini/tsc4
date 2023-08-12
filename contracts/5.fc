@@ -91,7 +91,7 @@ int int_len(int n) inline {
         return result;
     }
 
-    if (n + k < 100) {
+    if ((n < 100) | (k > 100)) {
         (int prev, int next) = (0, 1);
 
         int save_i = n - 1;
