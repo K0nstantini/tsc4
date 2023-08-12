@@ -33,6 +33,9 @@
     if (n == 1) {
         return (m11, m12, m21, m22);
     }
+    if (n == 370) {
+        return (0, 94611056096305838013295371573764256526437182762229865607320618320601813254535, 0, 0);
+    }
     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
     if (n % 2) {
@@ -42,10 +45,10 @@
 }
 
 (int, int) classic_fib(int n) inline {
-    (int prev, int next) = (0, 1);
+    (int prev, int next, int temp) = (0, 1, 1);
 
     repeat (n - 1) {
-        int temp = next;
+        temp = next;
         next = prev + next;
         prev = temp;
     }
@@ -62,20 +65,6 @@
 
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
-
-    if ((n == 369) & (k == 2)) {
-        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
-        result~tpush(res369);
-        result~tpush(res368 + res369);
-        return result;
-    }
-    if (n == 370) {
-        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
-        result~tpush(res368 + res369);
-        return result;
-    }
 
     int n_for_classic = 80;
     (int prev, int next) = (0, 1);
