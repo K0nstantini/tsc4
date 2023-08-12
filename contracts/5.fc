@@ -1,60 +1,55 @@
-{-
-  TASK 5 - Fibonacci sequence
-  Implement a function that generates the Fibonacci
-  sequence from N to N+K terms (0<=N<=370; 0<=N+K<=371; 0<=K<=255).
-  The first two terms of the Fibonacci sequence are F_0 = 0 and F_1 = 1,
-  and the rest are defined as F_n = F_(n-1) + F_(n-2).
-  The resulting Fibonacci sequence should be stored in a tuple.
-  For example, a request with N = 1 and K = 3 should return a tuple [1, 1, 2],
-  and a request with N = 201 and K = 4 should return a tuple
-  [453973694165307953197296969697410619233826,
-  734544867157818093234908902110449296423351,
-  1188518561323126046432205871807859915657177,
-  1923063428480944139667114773918309212080528]
--}
+;; -
+;; TASK 5 - Fibonacci sequence
+;;         Implement a function that generates the Fibonacci
+;;         sequence from N to N+K terms (0<=N<=370; 0<=N+K<=371; 0<=K<=255).
+;;         The first two terms of the Fibonacci sequence are F_0 = 0 and F_1 = 1,
+;;         and the rest are defined as F_n = F_(n-1) + F_(n-2).
+;;         The resulting Fibonacci sequence should be stored in a tuple.
+;;         For example, a request with N = 1 and K = 3 should return a tuple [1, 1, 2],
+;;         and a request with N = 201 and K = 4 should return a tuple
+;;         [453973694165307953197296969697410619233826,
+;;         734544867157818093234908902110449296423351,
+;;         1188518561323126046432205871807859915657177,
+;;         1923063428480944139667114773918309212080528]
+;;         -}
+
 
 
 () recv_internal() {
 }
 
 
-;; (int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
-;;     return (
-;;             a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
-;;             a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
-;;     );
-;; }
+(int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
+    return (
+            a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
+            a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
+    );
+}
 
-;; (int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
-;;     if (n == 0) {
-;;         return (i11, i12, i21, i22);
-;;     }
-;;     if (n == 1) {
-;;         return (m11, m12, m21, m22);
-;;     }
-;;     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
-;;     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
-;;     if (n % 2) {
-;;         (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
-;;     }
-;;     return (y11, y12, y21, y22);
-;; }
-
-int fib(int n, int r11, int r12, int r21, int r22, int m11, int m12, int m21, int m22) inline {
-    if (n <= 1) {
-        return n;
+(int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
+    if (n == 0) {
+        return (i11, i12, i21, i22);
     }
-
-    while (n) {
-        if (n % 2) {
-            ;;             (r11, r12, r21, r22) = mul(r11, r12, r21, r22, m11, m12, m21, m22);
-            (r11, r12, r21, r22) = (r11 * m11 + r12 * m21, r11 * m12 + r12 * m22, r21 * m11 + r22 * m21, r21 * m12 + r22 * m22);
-        }
-        n /= 2;
-;;         (m11, m12, m21, m22) = mul(m11, m12, m21, m22, m11, m12, m21, m22);
-        (m11, m12, m21, m22) = (m11 * m11 + m12 * m21, m11 * m12 + m12 * m22, m21 * m11 + m22 * m21, m21 * m12 + m22 * m22);
+    if (n == 1) {
+        return (m11, m12, m21, m22);
     }
-    return r21;
+    (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
+    (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
+    if (n % 2) {
+        (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
+    }
+    return (y11, y12, y21, y22);
+}
+
+(int, int) classic_fib(int n) inline {
+    (int prev, int next) = (0, 1);
+
+    repeat (n - 1) {
+        int temp = next;
+        next = prev + next;
+        prev = temp;
+    }
+    return (prev, next);
 }
 
 ;; testable
@@ -64,31 +59,41 @@ int fib(int n, int r11, int r12, int r21, int r22, int m11, int m12, int m21, in
     if (k == 0) {
         return result;
     }
+
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
 
     if ((n == 369) & (k == 2)) {
-        int res368 = fib(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        int res369 = fib(369, i11, i12, i21, i22, m11, m12, m21, m22);
+        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
+        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
         result~tpush(res369);
         result~tpush(res368 + res369);
         return result;
     }
     if (n == 370) {
-        int res368 = fib(368, i11, i12, i21, i22, m11, m12, m21, m22);
-        int res369 = fib(369, i11, i12, i21, i22, m11, m12, m21, m22);
+        (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
+        (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
         result~tpush(res368 + res369);
         return result;
     }
 
-    int prev = fib(n, i11, i12, i21, i22, m11, m12, m21, m22);
+    int n_for_classic = 20;
+    (int prev, int next) = (0, 1);
+
+    if (n < n_for_classic) {
+        (prev, next) = classic_fib(n + 1);
+    } else {
+        (_, prev, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
+    }
     result~tpush(prev);
 
     if (k == 1) {
         return result;
     }
 
-    int next = fib(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
+    if (n >= n_for_classic) {
+        (_, next, _, _) = pow(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
+    }
     result~tpush(next);
 
     repeat (k - 2) {
@@ -97,40 +102,6 @@ int fib(int n, int r11, int r12, int r21, int r22, int m11, int m12, int m21, in
         prev = temp;
         result~tpush(next);
     }
-
-    ;;     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
-    ;;     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
-    ;;
-    ;;     if ((n == 369) & (k == 2)) {
-    ;;         (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;         (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;         result~tpush(res369);
-    ;;         result~tpush(res368 + res369);
-    ;;         return result;
-    ;;     }
-    ;;     if (n == 370) {
-    ;;         (_, int res368, _, _) = pow(368, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;         (_, int res369, _, _) = pow(369, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;         result~tpush(res368 + res369);
-    ;;         return result;
-    ;;     }
-    ;;
-    ;;     (_, int prev, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;     result~tpush(prev);
-    ;;
-    ;;     if (k == 1) {
-    ;;         return result;
-    ;;     }
-    ;;
-    ;;     (_, int next, _, _) = pow(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;     result~tpush(next);
-    ;;
-    ;;     repeat (k - 2) {
-    ;;         int temp = next;
-    ;;         next = prev + next;
-    ;;         prev = temp;
-    ;;         result~tpush(next);
-    ;;     }
 
     return result;
 }
