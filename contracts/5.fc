@@ -68,7 +68,7 @@ int int_len(int n) inline {
 ;;     return result.at(1).at(0);
 ;; }
 
-(tuple) pow(tuple m, int n, tuple id) {
+(tuple) pow(tuple m, int n, tuple id) inline {
     if (n == 0) {
         return id;
     }
@@ -91,47 +91,76 @@ int int_len(int n) inline {
         return result;
     }
 
-    if ((n < 100) | (k > 100)) {
-        (int prev, int next) = (0, 1);
-
-        int save_i = n - 1;
-        int count = k + save_i;
-
-        if (n == 0) {
-            result~tpush(prev);
-        }
-
-        int i = 0;
-        while (i < count) {
-            int temp = next;
-            if (i < count - 1) {
-                next = prev + next;
-            }
-            prev = temp;
-            if (i >= save_i) {
-                result~tpush(prev);
-            }
-            i += 1;
-        }
-        return result;
-    }
-
     tuple id = to_tuple([to_tuple([1, 0]), to_tuple([0, 1])]);
     tuple m = to_tuple([to_tuple([1, 1]), to_tuple([1, 0])]);
 
-    int max = n + k - 1;
-    int last = min(max, 369);
-    while (n <= last) {
-        result~tpush(pow(m, n, id).at(0).at(1));
-        n += 1;
+    if ((n == 369) & (k == 2)) {
+        int res368 = pow(m, 368, id).at(0).at(1);
+        int res369 = pow(m, 369, id).at(0).at(1);
+        result~tpush(res369);
+        result~tpush(res368 + res369);
+        return result;
+    }
+    if (n == 370) {
+        int res = pow(m, 368, id).at(0).at(1) + pow(m, 369, id).at(0).at(1);
+        result~tpush(res);
+        return result;
     }
 
-    if (max == 370) {
-        int pre1 = k >= 2 ? result.at(k - 2) : pow(m, 369, id).at(0).at(1);
-        int pre2 = k >= 3 ? result.at(k - 3) : pow(m, 368, id).at(0).at(1);
-        result~tpush(pre1 + pre2);
+    int prev = pow(m, n, id).at(0).at(1);
+    result~tpush(prev);
+
+    if (k == 1) {
+        return result;
     }
 
+    int next = pow(m, n + 1, id).at(0).at(1);
+    result~tpush(next);
+
+    repeat (k - 2) {
+        int temp = next;
+        next = prev + next;
+        prev = temp;
+        result~tpush(next);
+    }
+
+    ;;     if ((n < 100) | (k > 100)) {
+    ;;         (int prev, int next) = (0, 1);
+    ;;
+    ;;         int save_i = n - 1;
+    ;;         int count = k + save_i;
+    ;;
+    ;;         if (n == 0) {
+    ;;             result~tpush(prev);
+    ;;         }
+    ;;
+    ;;         int i = 0;
+    ;;         while (i < count) {
+    ;;             int temp = next;
+    ;;             if (i < count - 1) {
+    ;;                 next = prev + next;
+    ;;             }
+    ;;             prev = temp;
+    ;;             if (i >= save_i) {
+    ;;                 result~tpush(prev);
+    ;;             }
+    ;;             i += 1;
+    ;;         }
+    ;;         return result;
+    ;;     }
+
+    ;;     int max = n + k - 1;
+    ;;     int last = min(max, 369);
+    ;;     while (n <= last) {
+    ;;         result~tpush(pow(m, n, id).at(0).at(1));
+    ;;         n += 1;
+    ;;     }
+    ;;
+    ;;     if (max == 370) {
+    ;;         int pre1 = k >= 2 ? result.at(k - 2) : pow(m, 369, id).at(0).at(1);
+    ;;         int pre2 = k >= 3 ? result.at(k - 3) : pow(m, 368, id).at(0).at(1);
+    ;;         result~tpush(pre1 + pre2);
+    ;;     }
 
 
     ;;
