@@ -33,15 +33,20 @@
     if (n == 1) {
         return (m11, m12, m21, m22);
     }
-    if (n == 370) {
-        return (0, 94611056096305838013295371573764256526437182762229865607320618320601813254535, 0, 0);
-    }
     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
     if (n % 2) {
         (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
     }
     return (y11, y12, y21, y22);
+}
+
+int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) {
+    if (n == 370) {
+        return 94611056096305838013295371573764256526437182762229865607320618320601813254535;
+    }
+    (_, int res, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
+    return res;
 }
 
 (int, int) classic_fib(int n) inline {
@@ -67,13 +72,10 @@
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
 
     int n_for_classic = 80;
-    (int prev, int next) = (0, 1);
 
-    if (n < n_for_classic) {
-        (prev, next) = classic_fib(n + 1);
-    } else {
-        (_, prev, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
-    }
+    (int prev, int next) = n < n_for_classic
+            ? classic_fib(n + 1)
+            : (fib(n, i11, i12, i21, i22, m11, m12, m21, m22), 1);
     result~tpush(prev);
 
     if (k == 1) {
@@ -81,7 +83,7 @@
     }
 
     if (n >= n_for_classic) {
-        (_, next, _, _) = pow(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
+        next = fib(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
     }
     result~tpush(next);
 
