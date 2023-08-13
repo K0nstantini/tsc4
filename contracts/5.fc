@@ -70,7 +70,7 @@ tuple fib_seq(int n, int prev, int next, tuple t) asm ""
         return result;
     }
 
-    (int prev, int next) = fib(max(n, 1) - 1);
+    (int prev, int next) = fibo(max(n, 1) - 1);
     if (n == 0) {
         result~tpush(0);
         k -= 1;
