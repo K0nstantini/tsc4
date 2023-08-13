@@ -74,5 +74,7 @@ describe('Task1', () => {
 
         res = await task1.getFindBranchByHash(hash(wrongTarget), tree);
         expect(res).toEqualCell(beginCell().endCell());
+
+
     });
 });

@@ -49,7 +49,7 @@ export class Task1 implements Contract {
             cell
         } as TupleItemCell;
 
-        const {stack} = await provider.get('find_branch_by_hash', [param1, param2]);
-        return stack.readCell();
+        const stack = await provider.get('find_branch_by_hash', [param1, param2]);
+        return stack.stack.readCell();
     }
 }
