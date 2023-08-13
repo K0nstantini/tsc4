@@ -50,9 +50,6 @@ export class Task5 implements Contract {
         } as TupleItemInt;
 
         const {stack} = await provider.get('fibonacci_sequence', [param1, param2]);
-        if (stack.remaining > 1) {
-            stack.skip();
-        }
         return stack.readTuple();
     }
 }

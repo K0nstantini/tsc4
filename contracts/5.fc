@@ -39,6 +39,7 @@ tuple fib_seq(int n, int prev, int next, tuple t) asm ""
         "}>"
         "s1 s2 XCHG"
         "TPUSH"
+        "SWAP"
         ;
 
 () recv_internal() {
