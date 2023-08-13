@@ -13,6 +13,7 @@
 ;;         1923063428480944139667114773918309212080528]
 ;;         -}
 
+forall X -> (tuple) to_tuple (X x) asm "NOP";
 
 (int, int) fib(int n) asm ""
         "0 INT"
@@ -22,54 +23,26 @@
         "TUCK"
         "ADD"
         "}>"
-        ;;         "SWAP"
-        ;;         "NIP"
+        ;
+
+tuple fib_seq(int n, int prev, int next, tuple t) asm ""
+;;         "NIL"
+        "3 -ROLL"
+        "ROT"
+        "REPEAT:<{"
+        "TUCK"
+        "2SWAP"
+        "TPUSH"
+        "-ROT"
+        "TUCK"
+        "ADD"
+        "}>"
+        "s1 s2 XCHG"
+        "TPUSH"
         ;
 
 () recv_internal() {
 }
-
-
-;; (int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
-;;     return (
-;;             a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
-;;             a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
-;;     );
-;; }
-;;
-;; (int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
-;;     if (n == 0) {
-;;         return (i11, i12, i21, i22);
-;;     }
-;;     if (n == 1) {
-;;         return (m11, m12, m21, m22);
-;;     }
-;;     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
-;;     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
-;;     if (n % 2) {
-;;         (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
-;;     }
-;;     return (y11, y12, y21, y22);
-;; }
-;;
-;; int fib(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
-;;     if (n == 370) {
-;;         return 94611056096305838013295371573764256526437182762229865607320618320601813254535;
-;;     }
-;;     (_, int res, _, _) = pow(n, i11, i12, i21, i22, m11, m12, m21, m22);
-;;     return res;
-;; }
-;;
-;; (int, int) classic_fib(int n) inline {
-;;     (int prev, int next, int temp) = (0, 1, 1);
-;;
-;;     repeat (n - 1) {
-;;         temp = next;
-;;         next = prev + next;
-;;         prev = temp;
-;;     }
-;;     return (prev, next);
-;; }
 
 (int, int) fibo(int n) inline {
     if (n == 369) {
@@ -80,10 +53,11 @@
                 );
     }
     if (n == 370) {
-        return (
-                94611056096305838013295371573764256526437182762229865607320618320601813254535,
-                0
-        );
+        return
+                (
+                        94611056096305838013295371573764256526437182762229865607320618320601813254535,
+                        0
+                );
     }
     return fib(n);
 }
@@ -96,45 +70,34 @@
         return result;
     }
 
-
-    (int prev, int next) = fibo(n);
-    result~tpush(prev);
+    (int prev, int next) = fib(max(n, 1) - 1);
+    if (n == 0) {
+        result~tpush(0);
+        k -= 1;
+    }
 
     if (k == 1) {
-        return result;
+        return to_tuple([next]);
     }
 
-    result~tpush(next);
+    return fib_seq(k - 1, prev, next, result);
 
-    repeat (k - 2) {
-        int temp = next;
-        next = prev + next;
-        prev = temp;
-        result~tpush(next);
-    }
 
-    return result;
 
-    ;;     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
-    ;;     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
+
+    ;;     tuple result = empty_tuple();
     ;;
-    ;;     int n_for_classic = 30;
+    ;;     if (k == 0) {
+    ;;         return result;
+    ;;     }
     ;;
-    ;;     (int prev, int next) = n < n_for_classic
-    ;;             ? classic_fib(n + 1)
-    ;;             : (fib(n, i11, i12, i21, i22, m11, m12, m21, m22), 1);
-    ;;
-    ;;     ;;     int prev = fib(n, i11, i12, i21, i22, m11, m12, m21, m22);
+    ;;     (int prev, int next) = fibo(n);
     ;;     result~tpush(prev);
     ;;
     ;;     if (k == 1) {
     ;;         return result;
     ;;     }
     ;;
-    ;;     if (n >= n_for_classic) {
-    ;;         next = fib(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
-    ;;     }
-    ;;     ;;     int next = fib(n + 1, i11, i12, i21, i22, m11, m12, m21, m22);
     ;;     result~tpush(next);
     ;;
     ;;     repeat (k - 2) {
@@ -143,7 +106,7 @@
     ;;         prev = temp;
     ;;         result~tpush(next);
     ;;     }
-
-    return result;
+    ;;
+    ;;     return result;
 }
 

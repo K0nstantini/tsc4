@@ -10,10 +10,6 @@ forall X -> int is_null (X x) asm "ISNULL";
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
-;; int equal_slices (slice a, slice b) asm "SDEQ";
-
-
-;; cell sref(slice s, int i) asm "PLDREFVAR";
 
 () recv_internal() {
 }
@@ -36,33 +32,4 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
     }
     return begin_cell().end_cell();
 
-
-    ;;     return begin_cell().end_cell();
-
-    ;;     tuple stack = null();
-    ;;     stack~push_back(tree);
-    ;;
-    ;;     while (~ stack.is_null()) {
-    ;;         cell c = stack~pop_back();
-    ;;         if (c.cell_hash() == hash) {
-    ;;             return c;
-    ;;         }
-    ;;         slice s = c.begin_parse();
-    ;;         repeat (s.slice_refs()) {
-    ;;             stack~push_back(s~load_ref());
-    ;;         }
-    ;;     }
-    ;;     return begin_cell().end_cell();
-
-    ;;     if (tree.cell_hash() == hash) {
-    ;;         return tree;
-    ;;     }
-    ;;     slice ds = tree.begin_parse();
-    ;;     repeat (ds.slice_refs()) {
-    ;;         cell c = find_branch_by_hash(hash, ds~load_ref());
-    ;;         if (c.cell_hash() == hash) {
-    ;;             return c;
-    ;;         }
-    ;;     }
-    ;;     return begin_cell().end_cell();
 }
