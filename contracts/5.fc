@@ -78,7 +78,8 @@ tuple fib_seq(int n, int prev, int next, tuple t) asm ""
     }
 
     if (k == 1) {
-        return to_tuple([next]);
+        result~tpush(next);
+        return result;
     }
 
     return fib_seq(k - 1, prev, next, result);
