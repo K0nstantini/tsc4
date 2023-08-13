@@ -83,7 +83,14 @@ describe('Task5', () => {
         checkEq(781774079430987230203437);
 
         res = await task5.getFibonacciSequence(0, 1);
+        console.log(res);
         checkEq(0);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(1, 1);
+        console.log(res);
+        checkEq(1);
+        expect(res.remaining).toEqual(0);
 
     });
 });
