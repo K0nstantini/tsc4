@@ -98,7 +98,6 @@ describe('Task5', () => {
 
 
         res = await task5.getFibonacciSequence(1, 1);
-        console.log(res);
         checkEq(1);
         expect(res.remaining).toEqual(0);
 

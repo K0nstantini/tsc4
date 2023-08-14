@@ -6,10 +6,23 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
+;;  64 - 1000000
+;;  65 - 1000001
+;;  90 - 1011010
+;;  91 - 1011011
+
+
+;;  96 - 1100000
+;;  97 - 1100001
+;; 122 - 1111010
+;; 123 - 1111011
 
 forall X -> int is_null (X x) asm "ISNULL";
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+
+(int, int) bit_refs(slice s) asm "SBITREFS";
+
 
 const n26 = 26;
 const n32 = 32;
@@ -25,6 +38,7 @@ const n122 = 122;
 }
 
 (cell) cipher(int shift, cell text) inline {
+    shift %= n26;
 
     slice ds = text.begin_parse();
     ds~skip_bits(n32);
@@ -41,9 +55,11 @@ const n122 = 122;
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, n32);
 
-    int has_ref = 1;
-    while (has_ref > 0) {
-        while (~ ds.slice_data_empty?()) {
+    (int bits, int refs) = (0, 0);
+
+    do {
+        (bits, refs) = bit_refs(ds);
+        repeat (bits / 8) {
             int letter = ds~load_uint(8);
 
             int new_letter = ((letter >= n65) & (letter <= n90))
@@ -53,17 +69,39 @@ const n122 = 122;
                     : letter;
 
             cur_builder~store_uint(new_letter, 8);
-
         }
         builders~push_back(cur_builder);
 
-        if (ds.slice_refs_empty?()) {
-            has_ref = 0;
-        } else {
+        if (refs > 0) {
             ds = ds~load_ref().begin_parse();
             cur_builder = begin_cell();
         }
-    }
+
+    } until (refs == 0);
+
+    ;;     int has_ref = 1;
+    ;;     while (has_ref > 0) {
+    ;;         while (~ ds.slice_data_empty?()) {
+    ;;             int letter = ds~load_uint(8);
+    ;;
+    ;;             int new_letter = ((letter >= n65) & (letter <= n90))
+    ;;                     ? (letter + shift_upper) % n26 + n65
+    ;;                     : ((letter >= n97) & (letter <= n122))
+    ;;                     ? (letter + shift_low) % n26 + n97
+    ;;                     : letter;
+    ;;
+    ;;             cur_builder~store_uint(new_letter, 8);
+    ;;
+    ;;         }
+    ;;         builders~push_back(cur_builder);
+    ;;
+    ;;         if (ds.slice_refs_empty?()) {
+    ;;             has_ref = 0;
+    ;;         } else {
+    ;;             ds = ds~load_ref().begin_parse();
+    ;;             cur_builder = begin_cell();
+    ;;         }
+    ;;     }
 
     builder value = builders~pop_back();
     cell dc = value.end_cell();
