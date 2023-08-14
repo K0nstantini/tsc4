@@ -19,43 +19,23 @@ forall X -> (tuple) to_tuple (X x) asm "NOP";
         "0 INT"
         "1 INT"
         "ROT"
-        "REPEAT:<{"
-        "TUCK"
-        "ADD"
-        "}>"
+        "REPEAT:<{ TUCK ADD }>"
         ;
 
 tuple fib_seq(int n, int prev, int next) asm ""
         "ROT"
-        "REPEAT:<{"
-        "2DUP"
-        "ADD"
-        "}>"
+        "REPEAT:<{ 2DUP ADD }>"
         "DEPTH"
         "TUPLEVAR"
         ;
 
-
 () recv_internal() {
 }
 
-;; (int, int) fibo(int n) inline {
-;;     if (n == 370) {
-;;         return
-;;                 (
-;;                         94611056096305838013295371573764256526437182762229865607320618320601813254535,
-;;                         0
-;;                 );
-;;     }
-;;     return fib(n);
-;; }
-
 ;; testable
 (tuple) fibonacci_sequence (int n, int k) method_id {
-    tuple result = empty_tuple();
-
     if (k == 0) {
-        return result;
+        return empty_tuple();
     }
 
     (int prev, int next) = n < 370
