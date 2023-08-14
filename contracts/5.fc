@@ -37,14 +37,15 @@ forall X -> (tuple) to_tuple (X x) asm "NOP";
     return (y11, y12, y21, y22);
 }
 
-(int, int) fib_matrix(int n) inline {
+int fib_matrix(int n) inline {
     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
     (_, int prev, _, _) = pow(n, i11, i12, i21, i21, m11, m12, m21, m22);
-    (_, int next, _, _) = n < 369
-            ? pow(n + 1, i11, i12, i21, i21, m11, m12, m21, m22)
-            : (0, 94611056096305838013295371573764256526437182762229865607320618320601813254535, 0, 0);
-    return (prev, next);
+    return prev;
+    ;;     (_, int next, _, _) = n < 369
+    ;;             ? pow(n + 1, i11, i12, i21, i21, m11, m12, m21, m22)
+    ;;             : (0, 94611056096305838013295371573764256526437182762229865607320618320601813254535, 0, 0);
+    ;;     return (prev, next);
 }
 
 (int, int) fib(int n) asm ""
@@ -73,9 +74,11 @@ tuple fib_seq(int n, int prev, int next) asm ""
         return to_tuple([94611056096305838013295371573764256526437182762229865607320618320601813254535]);
     }
 
-    (int prev, int next) = n < 350
-            ? fib(n)
-            : fib_matrix(n);
+    if ((k == 1) & (n > 200)) {
+        return to_tuple([fib_matrix(n)]);
+    }
+
+    (int prev, int next) = fib(n);
 
 
     if (k == 1) {
