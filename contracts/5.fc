@@ -74,12 +74,13 @@ tuple fib_seq(int n, int prev, int next, tuple t) asm ""
     if (n == 0) {
         result~tpush(0);
         k -= 1;
+        if (k == 0) {
+            return result;
+        }
     }
 
-    if (k <= 1) {
-        if (n > 0) {
-            result~tpush(next);
-        }
+    if (k == 1) {
+        result~tpush(next);
         return result;
     }
 
