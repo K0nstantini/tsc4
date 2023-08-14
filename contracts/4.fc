@@ -11,37 +11,46 @@ forall X -> int is_null (X x) asm "ISNULL";
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
+const n26 = 26;
+const n32 = 32;
+
+const n65 = 65;
+const n97 = 97;
+
+const n90 = 90;
+const n122 = 122;
+
 
 () recv_internal() {
 }
 
 (cell) cipher(int shift, cell text) inline {
-    shift %= 26;
+    shift %= n26;
 
     slice ds = text.begin_parse();
-    ds~skip_bits(32);
+    ds~skip_bits(n32);
 
     if (ds.slice_data_empty?() | (shift == 0)) {
         return text;
     }
 
-    int shift_upper = shift - 65;
-    int shift_low = shift - 97;
+    int shift_upper = shift - n65;
+    int shift_low = shift - n97;
 
     tuple builders = null();
 
     builder cur_builder = begin_cell();
-    cur_builder~store_uint(0, 32);
+    cur_builder~store_uint(0, n32);
 
     int has_ref = 1;
     while (has_ref > 0) {
         while (~ ds.slice_data_empty?()) {
             int letter = ds~load_uint(8);
 
-            int new_letter = ((letter >= 65) & (letter <= 90))
-                    ? (letter + shift_upper) % 26 + 65
-                    : ((letter >= 97) & (letter <= 122))
-                    ? (letter + shift_low) % 26 + 97
+            int new_letter = ((letter >= n65) & (letter <= n90))
+                    ? (letter + shift_upper) % n26 + n65
+                    : ((letter >= n97) & (letter <= n122))
+                    ? (letter + shift_low) % n26 + n97
                     : letter;
 
             cur_builder~store_uint(new_letter, 8);
