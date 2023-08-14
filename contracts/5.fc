@@ -37,10 +37,12 @@ tuple fib_seq(int n, int prev, int next) asm ""
     if (k == 0) {
         return empty_tuple();
     }
+    if (n == 370) {
+        return to_tuple([94611056096305838013295371573764256526437182762229865607320618320601813254535]);
+    }
 
-    (int prev, int next) = n < 370
-            ? fib(n)
-            : (94611056096305838013295371573764256526437182762229865607320618320601813254535, 0);
+    (int prev, int next) = fib(n);
+
 
     if (k == 1) {
         return to_tuple([prev]);
