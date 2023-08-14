@@ -25,7 +25,6 @@ const n122 = 122;
 }
 
 (cell) cipher(int shift, cell text) inline {
-    shift %= n26;
 
     slice ds = text.begin_parse();
     ds~skip_bits(n32);
@@ -47,24 +46,11 @@ const n122 = 122;
         while (~ ds.slice_data_empty?()) {
             int letter = ds~load_uint(8);
 
-            ;;             int new_letter = ((letter >= n65) & (letter <= n90))
-            ;;                     ? (letter + shift_upper) % n26 + n65
-            ;;                     : ((letter >= n97) & (letter <= n122))
-            ;;                     ? (letter + shift_low) % n26 + n97
-            ;;                     : letter;
-
-            int new_letter = letter;
-            if (letter >= n65) {
-                if (letter <= n90) {
-                    new_letter = (letter + shift_upper) % n26 + n65;
-                } else {
-                    if (letter >= n97) {
-                        if (letter <= n122) {
-                            new_letter = (letter + shift_low) % n26 + n97;
-                        }
-                    }
-                }
-            }
+            int new_letter = ((letter >= n65) & (letter <= n90))
+                    ? (letter + shift_upper) % n26 + n65
+                    : ((letter >= n97) & (letter <= n122))
+                    ? (letter + shift_low) % n26 + n97
+                    : letter;
 
             cur_builder~store_uint(new_letter, 8);
 
