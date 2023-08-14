@@ -79,30 +79,6 @@ const n122 = 122;
 
     } until (refs == 0);
 
-    ;;     int has_ref = 1;
-    ;;     while (has_ref > 0) {
-    ;;         while (~ ds.slice_data_empty?()) {
-    ;;             int letter = ds~load_uint(8);
-    ;;
-    ;;             int new_letter = ((letter >= n65) & (letter <= n90))
-    ;;                     ? (letter + shift_upper) % n26 + n65
-    ;;                     : ((letter >= n97) & (letter <= n122))
-    ;;                     ? (letter + shift_low) % n26 + n97
-    ;;                     : letter;
-    ;;
-    ;;             cur_builder~store_uint(new_letter, 8);
-    ;;
-    ;;         }
-    ;;         builders~push_back(cur_builder);
-    ;;
-    ;;         if (ds.slice_refs_empty?()) {
-    ;;             has_ref = 0;
-    ;;         } else {
-    ;;             ds = ds~load_ref().begin_parse();
-    ;;             cur_builder = begin_cell();
-    ;;         }
-    ;;     }
-
     builder value = builders~pop_back();
     cell dc = value.end_cell();
 
