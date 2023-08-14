@@ -28,6 +28,7 @@ tuple fib_seq(int k, int n) asm ""
         "ROT"
         "REPEAT:<{ TUCK ADD }>"
         "ROT"
+        "2 INT SUB"
         "REPEAT:<{ 2DUP ADD }>"
         "DEPTH"
         "TUPLEVAR"
@@ -50,7 +51,7 @@ tuple fib_seq(int k, int n) asm ""
         }
     }
 
-    return fib_seq(k - 2, n);
+    return fib_seq(k, n);
 
 }
 
