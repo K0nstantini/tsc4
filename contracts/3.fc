@@ -16,16 +16,8 @@
 
 -}
 
-forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-
-cell pack_cells(tuple t) asm ""
-        "<{"
-        "UNCONS"
-        "WHILE:<{ OVER ISNULL NOT }>DO<{ SWAP UNCONS ROT STBREFR }>"
-        "ENDC"
-        "}>CONT 1 1 CALLXARGS"
-        ;
-
+(int) tlen (tuple t) asm "TLEN";
+forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 () recv_internal() {
 }
@@ -56,7 +48,7 @@ int int_len(int n) inline {
             (int left, int right) = break_int(value, value_len, left_len, right_len);
             b~store_uint(left, left_len);
 
-            builders~push_back(b);
+            builders~tpush(b);
             b = begin_cell();
             b~store_uint(right, right_len);
             loaded_bits = right_len;
@@ -67,14 +59,12 @@ int int_len(int n) inline {
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
-
     slice ds = linked_list.begin_parse();
-
     if (ds.slice_data_empty?()) {
         return linked_list;
     }
 
-    tuple builders = null();
+    tuple builders = empty_tuple();
     builder cur_builder = begin_cell();
 
     int cell_max_bit = 1023;
@@ -99,7 +89,7 @@ int int_len(int n) inline {
                 bits -= 1;
             }
             if (loaded_bits == cell_max_bit) {
-                builders~push_back(cur_builder);
+                builders~tpush(cur_builder);
                 cur_builder = begin_cell();
                 loaded_bits = 0;
             }
@@ -109,7 +99,7 @@ int int_len(int n) inline {
             if (ds.slice_refs_empty?()) {
                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
                 if (cur_builder.builder_bits()) {
-                    builders~push_back(cur_builder);
+                    builders~tpush(cur_builder);
                 }
                 has_ref = 0;
             } else {
@@ -135,6 +125,16 @@ int int_len(int n) inline {
             ds = db.end_cell().begin_parse();
         }
     }
-    return pack_cells(builders);
+
+    builder value = builders~tpop();
+    cell dc = value.end_cell();
+
+    int count = builders.tlen();
+    repeat (count) {
+        value = builders~tpop();
+        dc = value.store_ref(dc).end_cell();
+    }
+
+    return dc;
 }
 
