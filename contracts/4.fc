@@ -23,6 +23,16 @@ forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
 (int, int) bit_refs(slice s) asm "SBITREFS";
 
+cell pack_cells(tuple t) asm ""
+        "<{"
+        "UNCONS"
+        "WHILE:<{ OVER ISNULL NOT }>DO<{ SWAP UNCONS ROT STBREFR }>"
+        "ENDC"
+        "}>CONT 1 1 CALLXARGS"
+        ;
+
+
+
 
 const n26 = 26;
 const n32 = 32;
@@ -79,13 +89,15 @@ const n122 = 122;
 
     } until (refs == 0);
 
-    builder value = builders~pop_back();
-    cell dc = value.end_cell();
+    ;;     builder value = builders~pop_back();
+    ;;     cell dc = value.end_cell();
+    ;;
+    ;;     while (~ builders.is_null()) {
+    ;;         value = builders~pop_back();
+    ;;         dc = value.store_ref(dc).end_cell();
+    ;;     }
 
-    while (~ builders.is_null()) {
-        value = builders~pop_back();
-        dc = value.store_ref(dc).end_cell();
-    }
+    cell dc = pack_cells(builders);
 
     return dc;
 }
