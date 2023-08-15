@@ -84,9 +84,9 @@ int bit_size(int n) asm "UBITSIZE";
         if (next_slice.slice_data_empty?()) {
             if (ds.slice_refs_empty?()) {
                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
-                if (cur_builder.builder_bits()) {
+;;                 if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
-                }
+;;                 }
                 has_ref = 0;
             } else {
                 slice new_ds = ds~load_ref().begin_parse();
