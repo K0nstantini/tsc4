@@ -32,8 +32,6 @@ cell pack_cells(tuple t) asm ""
         ;
 
 
-
-
 const n26 = 26;
 const n32 = 32;
 
@@ -53,7 +51,7 @@ const n122 = 122;
     slice ds = text.begin_parse();
     ds~skip_bits(n32);
 
-    if (ds.slice_data_empty?() | (shift == 0)) {
+    if (ds.slice_data_empty?()) {
         return text;
     }
 
@@ -89,17 +87,9 @@ const n122 = 122;
 
     } until (refs == 0);
 
-    ;;     builder value = builders~pop_back();
-    ;;     cell dc = value.end_cell();
-    ;;
-    ;;     while (~ builders.is_null()) {
-    ;;         value = builders~pop_back();
-    ;;         dc = value.store_ref(dc).end_cell();
-    ;;     }
 
-    cell dc = pack_cells(builders);
+    return pack_cells(builders);
 
-    return dc;
 }
 
 ;; testable
