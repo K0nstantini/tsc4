@@ -26,6 +26,10 @@ cell pack_cells(tuple t) asm ""
         "}>CONT 1 1 CALLXARGS"
         ;
 
+(builder, int) store_to_builder(int x, builder b, int  l) asm "<{ STUXQ }>CONT 3 2 CALLXARGS";
+
+const max_bits = 1023;
+
 () recv_internal() {
 }
 
@@ -44,25 +48,85 @@ int int_len(int n) inline {
     return (ds~load_uint(left_len), ds~load_uint(right_len));
 }
 
-(builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len) inline {
-    if (value_len) {
-        if (loaded_bits + value_len <= 1023) {
-            b~store_uint(value, value_len);
-            loaded_bits += value_len;
-        } else {
-            int left_len = (1023 - loaded_bits);
-            int right_len = (value_len - left_len);
-            (int left, int right) = break_int(value, value_len, left_len, right_len);
-            b~store_uint(left, left_len);
+;; (builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len) inline {
+;;     if (value_len) {
+;;         if (loaded_bits + value_len <= max_bits) {
+;;             b~store_uint(value, value_len);
+;;             loaded_bits += value_len;
+;;         } else {
+;;             int left_len = (max_bits - loaded_bits);
+;;             int right_len = (value_len - left_len);
+;;             (int left, int right) = break_int(value, value_len, left_len, right_len);
+;;             b~store_uint(left, left_len);
+;;
+;;             builders~push_back(b);
+;;             b = begin_cell();
+;;             b~store_uint(right, right_len);
+;;             loaded_bits = right_len;
+;;         }
+;;     }
+;;     return (b, (builders, loaded_bits));
+;; }
 
-            builders~push_back(b);
-            b = begin_cell();
-            b~store_uint(right, right_len);
-            loaded_bits = right_len;
-        }
+(builder, tuple) store_bits(builder b, tuple builders, int value, int len) inline {
+    (b, int res) = store_to_builder(value, b, len);
+    if (res == 0) {
+        return (b, builders);
     }
-    return (b, (builders, loaded_bits));
+    int bits = b.builder_bits();
+    if  (bits == max_bits) {
+        builders~push_back(b);
+        return (begin_cell().store_uint(value, len), builders);
+    }
+
+    int left_len = (max_bits - b.builder_bits());
+    int right_len = len - left_len;
+    (int left, int right) = break_int(value, len, left_len, right_len);
+
+    b~store_uint(left, left_len);
+    builders~push_back(b);
+    return (begin_cell().store_uint(right, right_len), builders);
+
 }
+
+;; cell find_with_same(int len, int flag, int value, int depth, slice ds) inline {
+;;
+;;     tuple builders = null();
+;;     builder cur_builder = begin_cell();
+;;
+;;     int bits = ds.slice_bits();
+;;     while (bits >= len) {
+;;         if (flag == ds.preload_uint(len)) {
+;;             ds~skip_bits(len);
+;;             cur_builder~store_uint(value, len);
+;;             bits -= len;
+;;         } else {
+;;             cur_builder~store_uint(ds~load_uint(1), 1);
+;;             bits -= 1;
+;;         }
+;;     }
+;;     builders~push_back(cur_builder);
+;;
+;;     repeat (depth) {
+;;         ds = ds~load_ref().begin_parse();
+;;         cur_builder = begin_cell();
+;;
+;;         bits = ds.slice_bits();
+;;         while (bits >= len) {
+;;             if (flag == ds.preload_uint(len)) {
+;;                 ds~skip_bits(len);
+;;                 cur_builder~store_uint(value, len);
+;;                 bits -= len;
+;;             } else {
+;;                 cur_builder~store_uint(ds~load_uint(1), 1);
+;;                 bits -= 1;
+;;             }
+;;         }
+;;         builders~push_back(cur_builder);
+;;     }
+;;
+;;     return pack_cells(builders);
+;; }
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
@@ -71,45 +135,52 @@ int int_len(int n) inline {
         return linked_list;
     }
 
-    tuple builders = null();
-    builder cur_builder = begin_cell();
-
     int flag_len = int_len(flag);
     int value_len = int_len(value);
 
+    ;;     if  (flag_len == value_len) {
+    ;;         return find_with_same(flag_len, flag, value, linked_list.cell_depth(), ds);
+    ;;     }
+
+    tuple builders = null();
+    builder cur_builder = begin_cell();
+
     slice next_slice = begin_cell().end_cell().begin_parse();
 
-    int loaded_bits = 0;
+    ;;     int loaded_bits = 0;
     int has_ref = 1;
     while (has_ref > 0) {
         int bits = ds.slice_bits();
         while (bits >= flag_len) {
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
-                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len);
+                builders = cur_builder~store_bits(builders, value, value_len);
+                ;;                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len);
                 bits -= flag_len;
             } else {
-                cur_builder~store_uint(ds~load_uint(1), 1);
-                loaded_bits += 1;
+                builders = cur_builder~store_bits(builders, ds~load_uint(1), 1);
+                ;;                 cur_builder~store_uint(ds~load_uint(1), 1);
+                ;;                 loaded_bits += 1;
                 bits -= 1;
             }
-            if (loaded_bits == 1023) {
-                builders~push_back(cur_builder);
-                cur_builder = begin_cell();
-                loaded_bits = 0;
-            }
+            ;;             if (loaded_bits == max_bits) {
+            ;;                 builders~push_back(cur_builder);
+            ;;                 cur_builder = begin_cell();
+            ;;                 loaded_bits = 0;
+            ;;             }
         }
 
         if (next_slice.slice_data_empty?()) {
             if (ds.slice_refs_empty?()) {
-                (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits);
+                builders = cur_builder~store_bits(builders, ds~load_uint(bits), bits);
+                ;;                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits);
                 if (cur_builder.builder_bits()) {
                     builders~push_back(cur_builder);
                 }
                 has_ref = 0;
             } else {
                 slice new_ds = ds~load_ref().begin_parse();
-                int new_bits_len = min(1023 - bits, new_ds.slice_bits());
+                int new_bits_len = min(max_bits - bits, new_ds.slice_bits());
                 builder db = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
                         .store_slice(new_ds~load_bits(new_bits_len));

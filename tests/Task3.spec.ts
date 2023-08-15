@@ -153,6 +153,10 @@ describe('Task3', () => {
             )
             .endCell();
 
+        // let c = beginCell()
+        //     .storeUint(1, 1)
+        //     .endCell();
+        // let res = await task3.getFindAndReplace(0x10, 0x11, c);
 
         let res = await task3.getFindAndReplace(flag, value, list);
         let ds = res.beginParse();
