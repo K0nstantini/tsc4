@@ -59,12 +59,12 @@ int bit_size(int n) asm "UBITSIZE";
     int flag_len = bit_size(flag);
     int value_len = bit_size(value);
 
-    slice flag_slice = begin_cell()
+    slice flag_slice = cur_builder
             .store_uint(flag, flag_len)
             .end_cell()
             .begin_parse();
 
-    slice next_slice = begin_cell().end_cell().begin_parse();
+    slice next_slice = cur_builder.end_cell().begin_parse();
 
     int loaded_bits = 0;
     int has_ref = 1;
