@@ -17,11 +17,12 @@
 -}
 
 
-(int) tlen (tuple t) asm "TLEN";
+int tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
-(int) pow2 (int n) asm "POW2";
+int pow2 (int n) asm "POW2";
 int bit_size(int n) asm "UBITSIZE";
+(int, int) bit_refs(slice s) asm "SBITREFS";
 
 () recv_internal() {
 }
@@ -33,10 +34,10 @@ int bit_size(int n) asm "UBITSIZE";
             loaded_bits += value_len;
         } else {
             int left_len = cell_max_bit - loaded_bits;
-            int right_len = (value_len - left_len);
+            int right_len = value_len - left_len;
             b~store_uint(value >> right_len, left_len);
-
             builders~tpush(b);
+
             b = begin_cell().store_uint(value & (pow2(right_len) - 1), right_len);
             loaded_bits = right_len;
         }
@@ -64,7 +65,8 @@ int bit_size(int n) asm "UBITSIZE";
     int loaded_bits = 0;
     int has_ref = 1;
     while (has_ref > 0) {
-        int bits = ds.slice_bits();
+;;         int bits = ds.slice_bits();
+        (int bits, int refs) =  bit_refs(ds);
         while (bits >= flag_len) {
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
@@ -83,7 +85,7 @@ int bit_size(int n) asm "UBITSIZE";
         }
 
         if (next_slice.slice_data_empty?()) {
-            if (ds.slice_refs_empty?()) {
+            if (refs == 0) {
                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
                 if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
