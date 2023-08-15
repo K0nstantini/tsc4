@@ -23,6 +23,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 int pow2 (int n) asm "POW2";
 int bit_size(int n) asm "UBITSIZE";
 (int, int) bit_refs(slice s) asm "SBITREFS";
+(slice, int) is_begin_with(slice s, slice sub) asm "SDBEGINSXQ";
 
 () recv_internal() {
 }
@@ -58,6 +59,11 @@ int bit_size(int n) asm "UBITSIZE";
     int flag_len = bit_size(flag);
     int value_len = bit_size(value);
 
+    slice flag_slice = begin_cell()
+            .store_uint(flag, flag_len)
+            .end_cell()
+            .begin_parse();
+
     slice next_slice = begin_cell().end_cell().begin_parse();
 
     int loaded_bits = 0;
@@ -65,8 +71,8 @@ int bit_size(int n) asm "UBITSIZE";
     while (has_ref > 0) {
         int bits = ds.slice_bits();
         while (bits >= flag_len) {
-            if (flag == ds.preload_uint(flag_len)) {
-                ds~skip_bits(flag_len);
+            (ds, int success) = is_begin_with(ds, flag_slice);
+            if (success) {
                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len, cell_max_bit);
                 bits -= flag_len;
             } else {
@@ -118,5 +124,6 @@ int bit_size(int n) asm "UBITSIZE";
     }
 
     return dc;
+
 }
 
