@@ -21,17 +21,9 @@
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 (int) pow2 (int n) asm "POW2";
+int bit_size(int n) asm "UBITSIZE";
 
 () recv_internal() {
-}
-
-int int_len(int n) inline {
-    int len = 0;
-    while (n) {
-        n = n >> 1;
-        len += 1;
-    }
-    return len;
 }
 
 (builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len, int cell_max_bit) inline {
@@ -64,8 +56,8 @@ int int_len(int n) inline {
 
     int cell_max_bit = 1023;
 
-    int flag_len = int_len(flag);
-    int value_len = int_len(value);
+    int flag_len = bit_size(flag);
+    int value_len = bit_size(value);
 
     slice next_slice = begin_cell().end_cell().begin_parse();
 
