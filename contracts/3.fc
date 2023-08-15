@@ -22,7 +22,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 int pow2 (int n) asm "POW2";
 int bit_size(int n) asm "UBITSIZE";
-;; (int, int) bit_refs(slice s) asm "SBITREFS";
+(int, int) bit_refs(slice s) asm "SBITREFS";
 
 () recv_internal() {
 }
@@ -93,7 +93,9 @@ int bit_size(int n) asm "UBITSIZE";
                 builder db = begin_cell()
                         .store_uint(ds~load_uint(bits), bits)
                         .store_slice(new_ds~load_bits(min(cell_max_bit - bits, new_ds.slice_bits())));
-                if (new_ds.slice_data_empty?() & ~ new_ds.slice_refs_empty?()) {
+                (int b, int r) = bit_refs(new_ds);
+                if (r & (b == 0)) {
+                    ;;                 if (new_ds.slice_data_empty?() & ~ new_ds.slice_refs_empty?()) {
                     db = db.store_ref(new_ds~load_ref());
                 }
                 ds = db.end_cell().begin_parse();
