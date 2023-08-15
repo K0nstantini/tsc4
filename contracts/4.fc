@@ -67,23 +67,14 @@ const n122 = 122;
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, n32);
 
-
     repeat (ds.slice_bits() / 8) {
-        ;;         cur_builder~store_uint(get_letter(shift_low, shift_upper, ds~load_uint(8)), 8);
         int letter = ds~load_uint(8);
-
-        ;;         ((letter >= n97) & (letter <= n122))
-        ;;                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
-        ;;                 : ((letter >= n65) & (letter <= n90))
-        ;;                 ? cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8)
-        ;;                 : cur_builder~store_uint(letter, 8);
 
         ((letter >= n97) & (letter <= n122))
                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
                 : ((letter < n65) | (letter > n90))
                 ? cur_builder~store_uint(letter, 8)
                 : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
-
 
     }
     builders~push_back(cur_builder);
@@ -93,7 +84,6 @@ const n122 = 122;
         cur_builder = begin_cell();
 
         repeat (ds.slice_bits() / 8) {
-            ;;             cur_builder~store_uint(get_letter(shift_low, shift_upper, ds~load_uint(8)), 8);
             int letter = ds~load_uint(8);
 
             ((letter >= n97) & (letter <= n122))
