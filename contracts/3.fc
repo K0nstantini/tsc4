@@ -99,11 +99,11 @@ int bit_size(int n) asm "UBITSIZE";
                 next_slice = new_ds;
             }
         } else {
-            (int bits, int refs) = bit_refs(next_slice);
+            (int next_bits, int next_refs) = bit_refs(next_slice);
             builder db = begin_cell()
                     .store_uint(ds~load_uint(bits), bits)
-                    .store_slice(next_slice~load_bits(bits));
-            if (refs) {
+                    .store_slice(next_slice~load_bits(next_bits));
+            if (next_refs) {
                 db = db.store_ref(next_slice~load_ref());
             }
             ds = db.end_cell().begin_parse();
