@@ -65,8 +65,9 @@ int bit_size(int n) asm "UBITSIZE";
     int loaded_bits = 0;
     int has_ref = 1;
     while (has_ref > 0) {
-;;         int bits = ds.slice_bits();
-        (int bits, int refs) =  bit_refs(ds);
+        int bits = ds.slice_bits();
+        ;;         (int bits, int refs) =  bit_refs(ds);
+        (int next_bits, int next_refs) = bit_refs(next_slice);
         while (bits >= flag_len) {
             if (flag == ds.preload_uint(flag_len)) {
                 ds~skip_bits(flag_len);
@@ -84,8 +85,8 @@ int bit_size(int n) asm "UBITSIZE";
             }
         }
 
-        if (next_slice.slice_data_empty?()) {
-            if (refs == 0) {
+        if (next_bits == 0) {
+            if (ds.slice_refs_empty?()) {
                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
                 if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
@@ -104,11 +105,11 @@ int bit_size(int n) asm "UBITSIZE";
                 next_slice = new_ds;
             }
         } else {
-            int next_slice_len = next_slice.slice_bits();
+;;             int next_slice_len = next_slice.slice_bits();
             builder db = begin_cell()
                     .store_uint(ds~load_uint(bits), bits)
-                    .store_slice(next_slice~load_bits(next_slice_len));
-            if (~ next_slice.slice_refs_empty?()) {
+                    .store_slice(next_slice~load_bits(next_bits));
+            if (next_refs) {
                 db = db.store_ref(next_slice~load_ref());
             }
             ds = db.end_cell().begin_parse();
