@@ -159,11 +159,11 @@ int int_len(int n) inline {
                 bits -= flag_len;
             } else {
                 ;;                 builders = cur_builder~store_bits(builders, ds~load_uint(1), 1);
-                cur_builder~store_uint(ds~load_uint(1), 1);
                 if (cur_builder.builder_bits() == max_bits) {
                     builders~push_back(cur_builder);
                     cur_builder = begin_cell();
                 }
+                cur_builder~store_uint(ds~load_uint(1), 1);
                 ;;                 loaded_bits += 1;
                 bits -= 1;
             }
