@@ -51,7 +51,7 @@ const n122 = 122;
     slice ds = text.begin_parse();
     ds~skip_bits(n32);
 
-    if (ds.slice_data_empty?()) {
+    if ((shift == 0) | ds.slice_data_empty?()) {
         return text;
     }
 
