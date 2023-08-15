@@ -65,14 +65,20 @@ int bit_size(int n) asm "UBITSIZE";
     while (has_ref > 0) {
         int bits = ds.slice_bits();
         while (bits >= flag_len) {
-            if (flag == ds.preload_uint(flag_len)) {
+            int compare_chunk = ds.preload_uint(flag_len);
+            if (flag == compare_chunk) {
                 ds~skip_bits(flag_len);
                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, value, value_len, cell_max_bit);
                 bits -= flag_len;
             } else {
-                cur_builder~store_uint(ds~load_uint(1), 1);
-                loaded_bits += 1;
-                bits -= 1;
+                int can_load = max(flag_len - bit_size(compare_chunk), 1);
+                if (can_load == 1) {
+                    cur_builder~store_uint(ds~load_uint(1), 1);
+                    loaded_bits += 1;
+                } else {
+                    (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(can_load), can_load, cell_max_bit);
+                }
+                bits -= can_load;
             }
             if (loaded_bits == cell_max_bit) {
                 builders~tpush(cur_builder);
