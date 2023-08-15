@@ -34,33 +34,18 @@ int int_len(int n) inline {
     return len;
 }
 
-;; (int, int) break_int(int n, int int_len, int left_len, int right_len) inline {
-;;     cell dc = begin_cell().store_uint(n, int_len).end_cell();
-;;     slice ds = dc.begin_parse();
-;;     return (ds~load_uint(left_len), ds~load_uint(right_len));
-;; }
-
-(int, int) break_int(int n, int int_len, int left_len, int right_len) inline {
-    int right = n >> right_len;
-    int left = n & (pow2(right_len) - 1);
-    return (right, left);
-}
-
-
 (builder, (tuple, int)) save_bits(builder b, tuple builders, int loaded_bits, int value, int value_len, int cell_max_bit) inline {
     if (value_len) {
         if (loaded_bits + value_len <= cell_max_bit) {
             b~store_uint(value, value_len);
             loaded_bits += value_len;
         } else {
-            int left_len = (cell_max_bit - loaded_bits);
+            int left_len = cell_max_bit - loaded_bits;
             int right_len = (value_len - left_len);
-            (int left, int right) = break_int(value, value_len, left_len, right_len);
-            b~store_uint(left, left_len);
+            b~store_uint(value >> right_len, left_len);
 
             builders~tpush(b);
-            b = begin_cell();
-            b~store_uint(right, right_len);
+            b = begin_cell().store_uint(value & (pow2(right_len) - 1), right_len);
             loaded_bits = right_len;
         }
     }
