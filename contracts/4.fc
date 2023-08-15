@@ -19,8 +19,6 @@
 
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 
-;; (int, int) bit_refs(slice s) asm "SBITREFS";
-
 cell pack_cells(tuple t) asm ""
         "<{"
         "UNCONS"
@@ -61,19 +59,22 @@ const n122 = 122;
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, n32);
 
-    ;;     (int bits, int refs) = (0, 0);
-
 
     repeat (ds.slice_bits() / 8) {
         int letter = ds~load_uint(8);
 
-        int new_letter = ((letter >= n65) & (letter <= n90))
-                ? (letter + shift_upper) % n26 + n65
+;;         int new_letter = ((letter >= n65) & (letter <= n90))
+;;                 ? (letter + shift_upper) % n26 + n65
+;;                 : ((letter >= n97) & (letter <= n122))
+;;                 ? (letter + shift_low) % n26 + n97
+;;                 : letter;
+        ((letter >= n65) & (letter <= n90))
+                ? cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8)
                 : ((letter >= n97) & (letter <= n122))
-                ? (letter + shift_low) % n26 + n97
-                : letter;
+                ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
+                : cur_builder~store_uint(letter, 8);
 
-        cur_builder~store_uint(new_letter, 8);
+;;         cur_builder~store_uint(new_letter, 8);
     }
     builders~push_back(cur_builder);
 
@@ -84,40 +85,23 @@ const n122 = 122;
         repeat (ds.slice_bits() / 8) {
             int letter = ds~load_uint(8);
 
-            int new_letter = ((letter >= n65) & (letter <= n90))
-                    ? (letter + shift_upper) % n26 + n65
-                    : ((letter >= n97) & (letter <= n122))
-                    ? (letter + shift_low) % n26 + n97
-                    : letter;
+            ;;             int new_letter = ((letter >= n65) & (letter <= n90))
+            ;;                     ? (letter + shift_upper) % n26 + n65
+            ;;                     : ((letter >= n97) & (letter <= n122))
+            ;;                     ? (letter + shift_low) % n26 + n97
+            ;;                     : letter;
+            ;;
+            ;;             cur_builder~store_uint(new_letter, 8);
 
-            cur_builder~store_uint(new_letter, 8);
+            ((letter >= n65) & (letter <= n90))
+                    ? cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8)
+                    : ((letter >= n97) & (letter <= n122))
+                    ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
+                    : cur_builder~store_uint(letter, 8);
+
         }
         builders~push_back(cur_builder);
-
     }
-
-    ;;     do {
-    ;;         (bits, refs) = bit_refs(ds);
-    ;;         repeat (bits / 8) {
-    ;;             int letter = ds~load_uint(8);
-    ;;
-    ;;             int new_letter = ((letter >= n65) & (letter <= n90))
-    ;;                     ? (letter + shift_upper) % n26 + n65
-    ;;                     : ((letter >= n97) & (letter <= n122))
-    ;;                     ? (letter + shift_low) % n26 + n97
-    ;;                     : letter;
-    ;;
-    ;;             cur_builder~store_uint(new_letter, 8);
-    ;;         }
-    ;;         builders~push_back(cur_builder);
-    ;;
-    ;;         if (refs > 0) {
-    ;;             ds = ds~load_ref().begin_parse();
-    ;;             cur_builder = begin_cell();
-    ;;         }
-    ;;
-    ;;     } until (refs == 0);
-
 
     return pack_cells(builders);
 
