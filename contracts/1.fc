@@ -30,7 +30,6 @@ cell find_cell(cell tree, int hash) asm ""
         "DROP"
         "DEPTH"
         "2 SUBINT"
-        "IF:<{ 1 INT }>ELSE<{ NEWC ENDC  0 INT  }>"
         "IFNOTRET"
         "DUP"
         "JMPX"
@@ -38,8 +37,12 @@ cell find_cell(cell tree, int hash) asm ""
 
         "DUP"
         "EXECUTE"
+        "DEPTH"
+        "2 SUBINT"
+        "IFNOT:<{ NEWC ENDC }>"
 
         "}>CONT 2 1 CALLXARGS"
+
         ;
 
 
