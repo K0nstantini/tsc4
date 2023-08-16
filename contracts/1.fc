@@ -6,9 +6,9 @@
   this branch should be returned. Return empty cell if the branch is not found.
 -}
 
-;; forall X -> int is_null (X x) asm "ISNULL";
-;; forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-;; forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+forall X -> int is_null (X x) asm "ISNULL";
+forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
+forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
 ;; cell find(int hash, cell tree) asm ""
 ;;         "<{"
@@ -45,24 +45,26 @@
 () recv_internal() {
 }
 
-(cell, int) check_ref(int hash, cell branch, int success, cell empty_cell) inline {
-    if (success | (branch.cell_hash() == hash)) {
-        return (branch, 1);
-    }
-    slice ds = branch.begin_parse();
-    repeat (ds.slice_refs()) {
-        (cell c, int success) = check_ref(hash, ds~load_ref(), 0, empty_cell);
-        if (success) {
-            return (c, success);
-        }
-    }
-    return (empty_cell, 0);
-}
-
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    (cell  res, _) = check_ref(hash, tree, 0, begin_cell().end_cell());
-    return res;
+    tuple stack = null();
+    slice s = tree.begin_parse();
+    stack~push_back(s);
+
+    while (~ stack.is_null()) {
+        slice s = stack~pop_back();
+        if (s.slice_hash() == hash) {
+            return begin_cell().store_slice(s).end_cell();
+        }
+        int refs = s.slice_refs();
+        if (refs) {
+            stack~push_back(s~load_ref().begin_parse());
+            if (refs > 1)  {
+                stack~push_back(s);
+            }
+        }
+    }
+    return begin_cell().end_cell();
 
 ;;         if (tree.cell_hash() == hash) {
 ;;             return tree;
