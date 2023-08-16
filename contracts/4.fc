@@ -19,14 +19,6 @@
 
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 
-;; int get_letter(int shift_low, int shift_upper, int n) asm ""
-;;         "<{"
-;;         "DUP"
-;;         "65 GEQINT"
-;;         "IF:<{ DUP 90 LEQINT IF:<{ OVER ADD 26 INT MOD 65 ADDINT }>ELSE<{ DUP 97 GEQINT IF:<{ DUP 122 LEQINT IF:<{ ROT ADD 26 INT MOD 97 ADDINT }> }> }> }>"
-;;         "}>CONT 3 1 CALLXARGS"
-;;         ;
-
 cell pack_cells(tuple t) asm ""
         "<{"
         "UNCONS"
@@ -70,7 +62,9 @@ const n122 = 122;
     repeat (ds.slice_bits() / 8) {
         int letter = ds~load_uint(8);
 
-        ((letter >= n97) & (letter <= n122))
+        (letter == 97)
+                ? cur_builder~store_uint(letter + shift, 8)
+                : ((letter >= n97) & (letter <= n122))
                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
                 : ((letter < n65) | (letter > n90))
                 ? cur_builder~store_uint(letter, 8)
@@ -86,7 +80,9 @@ const n122 = 122;
         repeat (ds.slice_bits() / 8) {
             int letter = ds~load_uint(8);
 
-            ((letter >= n97) & (letter <= n122))
+            (letter == 97)
+                    ? cur_builder~store_uint(letter + shift, 8)
+                    : ((letter >= n97) & (letter <= n122))
                     ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
                     : ((letter < n65) | (letter > n90))
                     ? cur_builder~store_uint(letter, 8)

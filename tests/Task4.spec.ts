@@ -82,7 +82,7 @@ describe('Task4', () => {
         expect(ds.remainingBits).toEqual(0);
 
         a = "For instance, users may indicate the purpOSE OF A SIMPLE TRANSFER FROM THEIR WALLet to the wallet of another user in this t";
-        res = await task4.getCaesarCipherEncrypt(-7, simpleText(a));
+        res = await task4.getCaesarCipherEncrypt(19, simpleText(a));
         ds = res.beginParse();
         ds.skip(32);
         checkComplexText("Yhk bglmtgvx, nlxkl ftr bgwbvtmx max inkiHLX HY T LBFIEX MKTGLYXK YKHF MAXBK PTEExm mh max pteexm hy tghmaxk nlxk bg mabl m");
@@ -91,7 +91,7 @@ describe('Task4', () => {
         res = await task4.getCaesarCipherEncrypt(1, simpleText("?@[`{"));
         checkText("?@[`{");
 
-        res = await task4.getCaesarCipherEncrypt(-79, simpleText(""));
+        res = await task4.getCaesarCipherEncrypt(1, simpleText(""));
         checkText("");
 
 
