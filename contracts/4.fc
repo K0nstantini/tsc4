@@ -68,21 +68,28 @@ const n122 = 122;
         l += 1;
     }
 
-    letters~tpush(91);
-    letters~tpush(92);
-    letters~tpush(93);
-    letters~tpush(94);
-    letters~tpush(95);
-    letters~tpush(96);
+    repeat (6) {
+        letters~tpush(l);
+        l += 1;
+    }
 
-    l = 97;
+    ;;     letters~tpush(91);
+    ;;     letters~tpush(92);
+    ;;     letters~tpush(93);
+    ;;     letters~tpush(94);
+    ;;     letters~tpush(95);
+    ;;     letters~tpush(96);
+    ;;
+    ;;     l = 97;
     repeat (n26) {
         letters~tpush((l + shift_low) % n26 + n97);
         l += 1;
     }
 
-    ~dump(letters);
-
+    repeat (132) {
+        letters~tpush(l);
+        l += 1;
+    }
 
     tuple builders = null();
 
@@ -90,11 +97,8 @@ const n122 = 122;
     cur_builder~store_uint(0, n32);
 
     repeat (ds.slice_bits() / 8) {
-        int letter = ds~load_uint(8);
-
-        (letter <= n122)
-                ? cur_builder~store_uint(letters.at(letter), 8)
-                : cur_builder~store_uint(letter, 8);
+        ;;         int letter = ds~load_uint(8);
+        cur_builder~store_uint(letters.at(ds~load_uint(8)), 8);
 
         ;;         ((letter >= n97) & (letter <= n122))
         ;;                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
@@ -110,12 +114,7 @@ const n122 = 122;
         cur_builder = begin_cell();
 
         repeat (ds.slice_bits() / 8) {
-            int letter = ds~load_uint(8);
-
-            (letter <= n122)
-                    ? cur_builder~store_uint(letters.at(letter), 8)
-                    : cur_builder~store_uint(letter, 8);
-
+            cur_builder~store_uint(letters.at(ds~load_uint(8)), 8);
         }
         builders~push_back(cur_builder);
     }
