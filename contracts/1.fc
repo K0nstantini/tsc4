@@ -10,45 +10,74 @@
 ;; forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 ;; forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
 
-cell find(int hash, cell tree) asm ""
-        "<{"
-        "NULL"
-        "SWAP"
-        "2 TUPLE"
-
-        "UNTIL:<{"
-        "UNCONS"
-        "DUP"
-        "HASHCU"
-        "s3 PUSH"
-        "EQUAL"
-        " <{ 1 INT }> CONT"
-
-        "<{"
-        "CTOS"
-        "DUP"
-        "SREFS"
-        "REPEAT:<{ LDREF -ROT CONS SWAP }>"
-        "DROP"
-        "DUP"
-        "ISNULL"
-        "}> CONT IFELSE"
-
-        "}>"
-
-        "DUP"
-        "ISNULL"
-        "IF:<{ NEWC ENDC }>"
-        "}>CONT 2 1 CALLXARGS"
-        ;
+;; cell find(int hash, cell tree) asm ""
+;;         "<{"
+;;         "NULL"
+;;         "SWAP"
+;;         "2 TUPLE"
+;;
+;;         "UNTIL:<{"
+;;         "UNCONS"
+;;         "DUP"
+;;         "HASHCU"
+;;         "s3 PUSH"
+;;         "EQUAL"
+;;         " <{ 1 INT }> CONT"
+;;
+;;         "<{"
+;;         "CTOS"
+;;         "DUP"
+;;         "SREFS"
+;;         "REPEAT:<{ LDREF -ROT CONS SWAP }>"
+;;         "DROP"
+;;         "DUP"
+;;         "ISNULL"
+;;         "}> CONT IFELSE"
+;;
+;;         "}>"
+;;
+;;         "DUP"
+;;         "ISNULL"
+;;         "IF:<{ NEWC ENDC }>"
+;;         "}>CONT 2 1 CALLXARGS"
+;;         ;
 
 () recv_internal() {
 }
 
+(cell, int) check_ref(int hash, cell branch, int success, cell empty_cell) inline {
+    if (success | (branch.cell_hash() == hash)) {
+        return (branch, 1);
+    }
+    slice ds = branch.begin_parse();
+    repeat (ds.slice_refs()) {
+        (cell c, int success) = check_ref(hash, ds~load_ref(), 0, empty_cell);
+        if (success) {
+            return (c, success);
+        }
+    }
+    return (empty_cell, 0);
+}
+
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
+    (cell  res, _) = check_ref(hash, tree, 0, begin_cell().end_cell());
+    return res;
 
-    return find(hash, tree);
+;;         if (tree.cell_hash() == hash) {
+;;             return tree;
+;;         }
+;;         slice ds = tree.begin_parse();
+;;         repeat (ds.slice_refs()) {
+;;             cell c = find_branch_by_hash(hash, ds~load_ref());
+;;             if (c.cell_hash() == hash) {
+;;                 return c;
+;;             }
+;;         }
+;;
+;;     return begin_cell().end_cell();
+
+;;     return find(hash, tree);
 
 ;;     tuple stack = null();
 ;;     stack~push_back(tree);
