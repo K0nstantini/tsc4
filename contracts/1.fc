@@ -6,91 +6,61 @@
   this branch should be returned. Return empty cell if the branch is not found.
 -}
 
-forall X -> int is_null (X x) asm "ISNULL";
-forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+;; forall X -> int is_null (X x) asm "ISNULL";
+;; forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
+;; forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+;;
+;; int tlen (tuple t) asm "TLEN";
+;; forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
-int tlen (tuple t) asm "TLEN";
-forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
+cell find_cell(cell tree, int hash) asm ""
+        "<{"
 
-;; cell find(int hash, cell tree) asm ""
-;;         "<{"
-;;         "NULL"
-;;         "SWAP"
-;;         "2 TUPLE"
-;;
-;;         "UNTIL:<{"
-;;         "UNCONS"
-;;         "DUP"
-;;         "HASHCU"
-;;         "s3 PUSH"
-;;         "EQUAL"
-;;         " <{ 1 INT }> CONT"
-;;
-;;         "<{"
-;;         "CTOS"
-;;         "DUP"
-;;         "SREFS"
-;;         "REPEAT:<{ LDREF -ROT CONS SWAP }>"
-;;         "DROP"
-;;         "DUP"
-;;         "ISNULL"
-;;         "}> CONT IFELSE"
-;;
-;;         "}>"
-;;
-;;         "DUP"
-;;         "ISNULL"
-;;         "IF:<{ NEWC ENDC }>"
-;;         "}>CONT 2 1 CALLXARGS"
-;;         ;
+        "<{"
+        "ROT"
+        "DUP"
+        "HASHCU"
+        "s3 PUSH"
+        "EQUAL"
+        "IFRET"
+        "CTOS"
+        "DUP"
+        "SREFS"
+        "REPEAT:<{ LDREF SWAP  3 -ROLL }>"
+        "DROP"
+        "DEPTH"
+        "2 SUBINT"
+        "IF:<{ 1 INT }>ELSE<{ NEWC ENDC  0 INT  }>"
+        "IFNOTRET"
+        "DUP"
+        "JMPX"
+        "}> PUSHCONT"
+
+        "DUP"
+        "EXECUTE"
+
+        "}>CONT 2 1 CALLXARGS"
+        ;
+
 
 () recv_internal() {
 }
 
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    tuple stack = empty_tuple();
-    stack~tpush(tree);
+    return find_cell(tree, hash);
 
-    while (stack.tlen()) {
-        cell c = stack~tpop();
-        if (c.cell_hash() == hash) {
-            return c;
-        }
-        slice s = c.begin_parse();
-        repeat (s.slice_refs()) {
-            stack~tpush(s~load_ref());
-        }
-    }
-    return begin_cell().end_cell();
-
-;;         if (tree.cell_hash() == hash) {
-;;             return tree;
-;;         }
-;;         slice ds = tree.begin_parse();
-;;         repeat (ds.slice_refs()) {
-;;             cell c = find_branch_by_hash(hash, ds~load_ref());
-;;             if (c.cell_hash() == hash) {
-;;                 return c;
-;;             }
-;;         }
+;;     tuple stack = empty_tuple();
+;;     stack~tpush(tree);
 ;;
-;;     return begin_cell().end_cell();
-
-;;     return find(hash, tree);
-
-;;     tuple stack = null();
-;;     stack~push_back(tree);
-;;
-;;     while (~ stack.is_null()) {
-;;         cell c = stack~pop_back();
+;;     while (stack.tlen()) {
+;;         cell c = stack~tpop();
 ;;         if (c.cell_hash() == hash) {
 ;;             return c;
 ;;         }
 ;;         slice s = c.begin_parse();
 ;;         repeat (s.slice_refs()) {
-;;             stack~push_back(s~load_ref());
+;;             stack~tpush(s~load_ref());
 ;;         }
 ;;     }
 ;;     return begin_cell().end_cell();
