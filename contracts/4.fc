@@ -18,7 +18,7 @@
 ;; 123 - 1111011
 
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-forall X -> (tuple) to_tuple (X x) asm "NOP";
+;; forall X -> (tuple) to_tuple (X x) asm "NOP";
 
 cell pack_cells(tuple t) asm ""
         "<{"
@@ -56,42 +56,29 @@ const n122 = 122;
     int shift_low = shift - n97;
 
 
-    tuple  low_letters = empty_tuple();
+    tuple  letters = empty_tuple();
 
-    int  l = 97;
+    int  l = 65;
     repeat (n26) {
-        low_letters~tpush((l + shift_low) % n26 + n97);
+        letters~tpush((l + shift_upper) % n26 + n65);
         l += 1;
     }
 
-    ;;     tuple  low_letters = to_tuple([
-    ;;             (97 + shift_low) % n26 + n97,
-    ;;             (98 + shift_low) % n26 + n97,
-    ;;             (99 + shift_low) % n26 + n97,
-    ;;             (100 + shift_low) % n26 + n97,
-    ;;             (101 + shift_low) % n26 + n97,
-    ;;             (102 + shift_low) % n26 + n97,
-    ;;             (103 + shift_low) % n26 + n97,
-    ;;             (104 + shift_low) % n26 + n97,
-    ;;             (105 + shift_low) % n26 + n97,
-    ;;             (106 + shift_low) % n26 + n97,
-    ;;             (107 + shift_low) % n26 + n97,
-    ;;             (108 + shift_low) % n26 + n97,
-    ;;             (109 + shift_low) % n26 + n97,
-    ;;             (110 + shift_low) % n26 + n97,
-    ;;             (111 + shift_low) % n26 + n97,
-    ;;             (112 + shift_low) % n26 + n97,
-    ;;             (113 + shift_low) % n26 + n97,
-    ;;             (114 + shift_low) % n26 + n97,
-    ;;             (115 + shift_low) % n26 + n97,
-    ;;             (116 + shift_low) % n26 + n97,
-    ;;             (117 + shift_low) % n26 + n97,
-    ;;             (118 + shift_low) % n26 + n97,
-    ;;             (119 + shift_low) % n26 + n97,
-    ;;             (120 + shift_low) % n26 + n97,
-    ;;             (121 + shift_low) % n26 + n97,
-    ;;             (122 + shift_low) % n26 + n97
-    ;;     ]);
+    letters~tpush(91);
+    letters~tpush(92);
+    letters~tpush(93);
+    letters~tpush(94);
+    letters~tpush(95);
+    letters~tpush(96);
+
+    int l = 97;
+    repeat (n26) {
+        letters~tpush((l + shift_low) % n26 + n97);
+        l += 1;
+    }
+
+    ~dump(letters);
+
 
     tuple builders = null();
 
@@ -101,11 +88,9 @@ const n122 = 122;
     repeat (ds.slice_bits() / 8) {
         int letter = ds~load_uint(8);
 
-        ((letter >= n97) & (letter <= n122))
-                ? cur_builder~store_uint(low_letters.at(letter - n97), 8)
-                : ((letter < n65) | (letter > n90))
-                ? cur_builder~store_uint(letter, 8)
-                : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
+        ((letter >= n65) & (letter <= n122))
+                ? cur_builder~store_uint(letters.at(letter - n65), 8)
+                : cur_builder~store_uint(letter, 8);
 
         ;;         ((letter >= n97) & (letter <= n122))
         ;;                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
@@ -123,11 +108,9 @@ const n122 = 122;
         repeat (ds.slice_bits() / 8) {
             int letter = ds~load_uint(8);
 
-            ((letter >= n97) & (letter <= n122))
-                    ? cur_builder~store_uint(low_letters.at(letter - n97), 8)
-                    : ((letter < n65) | (letter > n90))
-                    ? cur_builder~store_uint(letter, 8)
-                    : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
+            ((letter >= n65) & (letter <= n122))
+                    ? cur_builder~store_uint(letters.at(letter - n65), 8)
+                    : cur_builder~store_uint(letter, 8);
 
         }
         builders~push_back(cur_builder);
