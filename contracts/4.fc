@@ -51,7 +51,7 @@ tuple hashmap(int shift)  asm ""
         "REPEAT:<{ INC DUP2 ADD 26 INT MOD 97 ADDINT -ROT }>"
         "NIP"
         "INC"
-        "132 INT"
+        "100 INT"
         "REPEAT:<{ DUP INC }>"
         "TUPLEVAR"
         ;
@@ -81,44 +81,6 @@ const n122 = 122;
     }
 
     tuple  letters = hashmap(shift);
-;;     tuple letters = empty_tuple();
-;;
-;;     int  l = 0;
-;;     repeat (65) {
-;;         letters~tpush(l);
-;;         l += 1;
-;;     }
-;;
-;;     int shift_upper = shift - n65;
-;;     repeat (n26) {
-;;         letters~tpush((l + shift_upper) % n26 + n65);
-;;         l += 1;
-;;     }
-;;
-;;     repeat (6) {
-;;         letters~tpush(l);
-;;         l += 1;
-;;     }
-
-    ;;     letters~tpush(91);
-    ;;     letters~tpush(92);
-    ;;     letters~tpush(93);
-    ;;     letters~tpush(94);
-    ;;     letters~tpush(95);
-    ;;     letters~tpush(96);
-    ;;
-    ;;     l = 97;
-
-;;     int shift_low = shift - n97;
-;;     repeat (n26) {
-;;         letters~tpush((l + shift_low) % n26 + n97);
-;;         l += 1;
-;;     }
-;;
-;;     repeat (132) {
-;;         letters~tpush(l);
-;;         l += 1;
-;;     }
 
     tuple builders = null();
 
