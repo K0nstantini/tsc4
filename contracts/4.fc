@@ -51,7 +51,7 @@ tuple hashmap(int shift)  asm ""
         "REPEAT:<{ INC DUP2 ADD 26 INT MOD 97 ADDINT -ROT }>"
         "NIP"
         "INC"
-        "100 INT"
+        "50 INT"
         "REPEAT:<{ DUP INC }>"
         "TUPLEVAR"
         ;
