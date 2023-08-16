@@ -6,20 +6,13 @@
   this branch should be returned. Return empty cell if the branch is not found.
 -}
 
-;; forall X -> int is_null (X x) asm "ISNULL";
-;; forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-;; forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
-;;
-;; int tlen (tuple t) asm "TLEN";
-;; forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
-
 cell find_cell(cell tree, int hash) asm ""
         "<{"
 
         "<{"
-        "s2 s1 s1 XCPUXC"
+        "ROT"
+        "s2 s0 PUSH2"
         "HASHCU"
-        "s3 PUSH"
         "EQUAL"
         "IFRET"
         "CTOS"
@@ -41,8 +34,8 @@ cell find_cell(cell tree, int hash) asm ""
         "IFNOT:<{ NEWC ENDC }>"
 
         "}>CONT 2 1 CALLXARGS"
-
         ;
+
 
 
 () recv_internal() {
@@ -51,20 +44,5 @@ cell find_cell(cell tree, int hash) asm ""
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
     return find_cell(tree, hash);
-
-;;     tuple stack = empty_tuple();
-;;     stack~tpush(tree);
-;;
-;;     while (stack.tlen()) {
-;;         cell c = stack~tpop();
-;;         if (c.cell_hash() == hash) {
-;;             return c;
-;;         }
-;;         slice s = c.begin_parse();
-;;         repeat (s.slice_refs()) {
-;;             stack~tpush(s~load_ref());
-;;         }
-;;     }
-;;     return begin_cell().end_cell();
 
 }
