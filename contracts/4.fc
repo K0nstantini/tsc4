@@ -26,7 +26,7 @@ cell pack_cells(tuple t) asm ""
         "UNCONS"
         "WHILE:<{ OVER ISNULL NOT }>DO<{ SWAP UNCONS ROT STBREFR }>"
         "ENDC"
-        "}>CONT 1 1 CALLXARGS"
+        "}>CONT 1 1 CALLXARGS"  ;; fix
         ;
 
 tuple hashmap(int shift)  asm ""
@@ -77,7 +77,8 @@ const n122 = 122;
     slice ds = text.begin_parse();
     ds~skip_bits(n32);
 
-    if ((shift == 0) | ds.slice_data_empty?()) {
+    int bits  = ds.slice_bits();
+    if ((shift == 0) | (bits == 0)) {
         return text;
     }
 
@@ -88,14 +89,13 @@ const n122 = 122;
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, n32);
 
-    repeat (ds.slice_bits() / 8) {
+    repeat (bits / 8) {
         cur_builder~store_uint(letters.at(ds~load_uint(8)), 8);
     }
     builders~push_back(cur_builder);
 
     repeat (text.cell_depth()) {
         (_, ds) = load_slice(ds);
-        ;;         ds = ds~load_ref().begin_parse();
         cur_builder = begin_cell();
 
         repeat (ds.slice_bits() / 8) {
