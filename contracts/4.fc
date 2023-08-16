@@ -95,7 +95,7 @@ const n122 = 122;
 
     repeat (text.cell_depth()) {
         (_, ds) = load_slice(ds);
-        builder cur_builder = begin_cell();
+        cur_builder = begin_cell();
 
         repeat (ds.slice_bits() / 8) {
             cur_builder~store_uint(letters.at(ds~load_uint(8)), 8);
