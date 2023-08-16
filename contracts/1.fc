@@ -8,10 +8,7 @@
 
 cell find_cell(cell tree, int hash) asm ""
         "<{"
-
-        "<{"
-        "TRY:<{ ROT 0 INT }>CATCH<{ 1 INT }>"
-        "IFRET"
+        "ROT"
         "s2 s0 PUSH2"
         "HASHCU"
         "EQUAL"
@@ -21,6 +18,9 @@ cell find_cell(cell tree, int hash) asm ""
         "SREFS"
         "REPEAT:<{ LDREF s3 s3 s0 XCHG3 }>"
         "DROP"
+        "DEPTH"
+        "2 SUBINT"
+        "IFNOTRET"
         "DUP"
         "JMPX"
         "}> PUSHCONT"
@@ -30,8 +30,7 @@ cell find_cell(cell tree, int hash) asm ""
         "DEPTH"
         "2 SUBINT"
         "IFNOT:<{ NEWC ENDC }>"
-
-        "}>CONT 2 1 CALLXARGS"
+        "1 INT ONLYTOPX"
         ;
 
 
