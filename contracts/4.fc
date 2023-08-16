@@ -55,10 +55,14 @@ const n122 = 122;
     int shift_upper = shift - n65;
     int shift_low = shift - n97;
 
-
     tuple  letters = empty_tuple();
 
-    int  l = 65;
+    int  l = 0;
+    repeat (65) {
+        letters~tpush(l);
+        l += 1;
+    }
+
     repeat (n26) {
         letters~tpush((l + shift_upper) % n26 + n65);
         l += 1;
@@ -71,7 +75,7 @@ const n122 = 122;
     letters~tpush(95);
     letters~tpush(96);
 
-    int l = 97;
+    l = 97;
     repeat (n26) {
         letters~tpush((l + shift_low) % n26 + n97);
         l += 1;
@@ -88,8 +92,8 @@ const n122 = 122;
     repeat (ds.slice_bits() / 8) {
         int letter = ds~load_uint(8);
 
-        ((letter >= n65) & (letter <= n122))
-                ? cur_builder~store_uint(letters.at(letter - n65), 8)
+        (letter <= n122)
+                ? cur_builder~store_uint(letters.at(letter), 8)
                 : cur_builder~store_uint(letter, 8);
 
         ;;         ((letter >= n97) & (letter <= n122))
@@ -108,8 +112,8 @@ const n122 = 122;
         repeat (ds.slice_bits() / 8) {
             int letter = ds~load_uint(8);
 
-            ((letter >= n65) & (letter <= n122))
-                    ? cur_builder~store_uint(letters.at(letter - n65), 8)
+            (letter <= n122)
+                    ? cur_builder~store_uint(letters.at(letter), 8)
                     : cur_builder~store_uint(letter, 8);
 
         }
