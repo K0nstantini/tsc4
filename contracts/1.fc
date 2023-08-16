@@ -6,16 +6,17 @@
   this branch should be returned. Return empty cell if the branch is not found.
 -}
 
-cell find_cell(slice s, int hash) asm ""
+cell find_cell(cell tree, int hash) asm ""
         "<{"
         "ROT"
         "s2 s0 PUSH2"
-        "HASHSU"
+        "HASHCU"
         "EQUAL"
         "IFRET"
+        "CTOS"
         "DUP"
         "SREFS"
-        "REPEAT:<{ LDREFRTOS 3 -ROLL }>"
+        "REPEAT:<{ LDREF s3 s3 s0 XCHG3 }>"
         "DROP"
         "DEPTH"
         "2 SUBINT"
@@ -28,11 +29,9 @@ cell find_cell(slice s, int hash) asm ""
         "EXECUTE"
         "DEPTH"
         "2 SUBINT"
-        "IF:<{ NEWC STSLICE ENDC }>ELSE<{ NEWC ENDC }>"
-        ;;         "IFNOT:<{ NEWC ENDC }>"
+        "IFNOT:<{ NEWC ENDC }>"
         "1 INT ONLYTOPX"
         ;
-
 
 
 
@@ -42,6 +41,6 @@ cell find_cell(slice s, int hash) asm ""
 
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    return find_cell(tree.begin_parse(), hash);
+    return find_cell(tree, hash);
 
 }

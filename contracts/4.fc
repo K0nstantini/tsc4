@@ -59,22 +59,7 @@ const n122 = 122;
     builder cur_builder = begin_cell();
     cur_builder~store_uint(0, n32);
 
-    repeat (ds.slice_bits() / 8) {
-        int letter = ds~load_uint(8);
-
-        ((letter >= n97) & (letter <= n122))
-                ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
-                : ((letter < n65) | (letter > n90))
-                ? cur_builder~store_uint(letter, 8)
-                : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
-
-    }
-    builders~push_back(cur_builder);
-
-    repeat (text.cell_depth()) {
-        ds = ds~load_ref().begin_parse();
-        cur_builder = begin_cell();
-
+    repeat (text.cell_depth() + 1) {
         repeat (ds.slice_bits() / 8) {
             int letter = ds~load_uint(8);
 
@@ -86,7 +71,40 @@ const n122 = 122;
 
         }
         builders~push_back(cur_builder);
+        if  (ds.slice_refs() > 0) {
+            ds = ds~load_ref().begin_parse();
+            cur_builder = begin_cell();
+        }
     }
+
+    ;;     repeat (ds.slice_bits() / 8) {
+    ;;         int letter = ds~load_uint(8);
+    ;;
+    ;;         ((letter >= n97) & (letter <= n122))
+    ;;                 ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
+    ;;                 : ((letter < n65) | (letter > n90))
+    ;;                 ? cur_builder~store_uint(letter, 8)
+    ;;                 : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
+    ;;
+    ;;     }
+    ;;     builders~push_back(cur_builder);
+    ;;
+    ;;     repeat (text.cell_depth()) {
+    ;;         ds = ds~load_ref().begin_parse();
+    ;;         cur_builder = begin_cell();
+    ;;
+    ;;         repeat (ds.slice_bits() / 8) {
+    ;;             int letter = ds~load_uint(8);
+    ;;
+    ;;             ((letter >= n97) & (letter <= n122))
+    ;;                     ? cur_builder~store_uint((letter + shift_low) % n26 + n97, 8)
+    ;;                     : ((letter < n65) | (letter > n90))
+    ;;                     ? cur_builder~store_uint(letter, 8)
+    ;;                     : cur_builder~store_uint((letter + shift_upper) % n26 + n65, 8);
+    ;;
+    ;;         }
+    ;;         builders~push_back(cur_builder);
+    ;;     }
 
     return pack_cells(builders);
 
