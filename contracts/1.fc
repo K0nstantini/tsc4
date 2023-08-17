@@ -89,33 +89,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     slice s = tree.begin_parse();
     int refs = s.slice_refs();
 
-    ;; ======  1 ================
-
-    if (refs  == 3) {
-        cell c = s~load_ref();
-        stack~tpush(s~load_ref());
-        stack~tpush(c);
-        stack~tpush(s~load_ref());
-    } else {
-        repeat (s.slice_refs()) {
-            stack~tpush(s~load_ref());
-        }
-    }
-
-    if (stack.tlen() == 0) {
-        return begin_cell().end_cell();
-    }
-
-    ;; ======  2 ================
-
-    cell c = stack~tpop();
-    if (c.cell_hash() == hash) {
-        return c;
-    }
-
-    slice s = tree.begin_parse();
-    int refs = s.slice_refs();
-
     if (refs == 1) {
         stack~tpush(s~load_ref());
     }
@@ -126,9 +99,9 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
     if  (refs == 3) {
         cell c = s~load_ref();
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
         stack~tpush(c);
+        stack~tpush(s~load_ref());
+        stack~tpush(s~load_ref());
     }
     if  (refs == 4) {
         cell c = s~load_ref();
@@ -137,6 +110,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         stack~tpush(s~load_ref());
         stack~tpush(s~load_ref());
     }
+
 
     ;;     stack~tpush(tree);
 
