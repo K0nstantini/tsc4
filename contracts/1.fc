@@ -11,7 +11,11 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 cell find_cell(cell tree, int hash) asm ""
         "<{"
+
+        "<{"
         "ROT"
+        "DEPTH DEC" ;; ch
+        "XCHGX" ;;  ch
         "s2 s0 PUSH2"
         "HASHCU"
         "EQUAL"
@@ -23,18 +27,26 @@ cell find_cell(cell tree, int hash) asm ""
         "DROP"
         "DEPTH"
         "2 SUBINT"
+        ;;         "3 SUBINT"  ;;  ch
         "IFNOTRET"
+
         "DUP"
         "JMPX"
         "}> PUSHCONT"
 
+        "s2 PUSH" ;;  ch
+        "3 -ROLL" ;;  ch
         "DUP"
         "EXECUTE"
-        "DEPTH"
-        "2 SUBINT"
-        "IFNOT:<{ NEWC ENDC }>"
-        "1 INT ONLYTOPX"
+                "DEPTH"
+                "2 SUBINT"
+                "IFNOT:<{ NEWC ENDC }>"
+;;                 "1 INT ONLYTOPX"
+;;                 "DEPTH"
+;;         "TUPLEVAR"
+        "}>CONT 2 1 CALLXARGS"
         ;
+
 
 
 
@@ -44,42 +56,45 @@ cell find_cell(cell tree, int hash) asm ""
 
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    ;;     return find_cell(tree, hash);
+        return find_cell(tree, hash);
+;;     tuple   res = find_cell(tree, hash);
+;;     ~dump(res);
+;;     return begin_cell().end_cell();
 
-    tuple stack = empty_tuple();
-    stack~tpush(tree);
-
-    while (stack.tlen()) {
-        cell c = stack~tpop();
-        if (c.cell_hash() == hash) {
-            return c;
-        }
-        slice s = c.begin_parse();
-        int refs = s.slice_refs();
-        if (refs == 1) {
-            stack~tpush(s~load_ref());
-        }
-        if  (refs == 2) {
-            cell c = s~load_ref();
-            stack~tpush(s~load_ref());
-            stack~tpush(c);
-        }
-        if  (refs == 3) {
-            cell c = s~load_ref();
-            stack~tpush(s~load_ref());
-            stack~tpush(s~load_ref());
-            stack~tpush(c);
-        }
-        if  (refs == 4) {
-            cell c = s~load_ref();
-            stack~tpush(s~load_ref());
-            stack~tpush(s~load_ref());
-            stack~tpush(s~load_ref());
-            stack~tpush(c);
-        }
-    }
-
-    return begin_cell().end_cell();
+    ;;     tuple stack = empty_tuple();
+    ;;     stack~tpush(tree);
+    ;;
+    ;;     while (stack.tlen()) {
+    ;;         cell c = stack~tpop();
+    ;;         if (c.cell_hash() == hash) {
+    ;;             return c;
+    ;;         }
+    ;;         slice s = c.begin_parse();
+    ;;         int refs = s.slice_refs();
+    ;;         if (refs == 1) {
+    ;;             stack~tpush(s~load_ref());
+    ;;         }
+    ;;         if  (refs == 2) {
+    ;;             cell c = s~load_ref();
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(c);
+    ;;         }
+    ;;         if  (refs == 3) {
+    ;;             cell c = s~load_ref();
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(c);
+    ;;         }
+    ;;         if  (refs == 4) {
+    ;;             cell c = s~load_ref();
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(s~load_ref());
+    ;;             stack~tpush(c);
+    ;;         }
+    ;;     }
+    ;;
+    ;;     return begin_cell().end_cell();
 
     ;;     tuple stack = empty_tuple();
     ;;     stack~tpush(tree);
