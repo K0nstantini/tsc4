@@ -140,8 +140,8 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     if  (refs == 4) {
         cell c = s~load_ref();
         stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
         stack~tpush(c);
+        stack~tpush(s~load_ref());
         stack~tpush(s~load_ref());
     }
 
