@@ -79,46 +79,31 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
     ;;     return find_cell(tree, hash);
 
-    ;;     tuple stack = empty_tuple();
-    ;;     stack~tpush(tree);
-    ;;
-    ;;     while (stack.tlen()) {
-    ;;         cell c = stack~tpop();
-    ;;         if (c.cell_hash() == hash) {
-    ;;             return c;
-    ;;         }
-    ;;         slice s = c.begin_parse();
-    ;;         int refs = s.slice_refs();
-    ;;         if (refs == 1) {
-    ;;             stack~tpush(s~load_ref());
-    ;;         }
-    ;;         if  (refs == 2) {
-    ;;             cell c = s~load_ref();
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(c);
-    ;;         }
-    ;;         if  (refs == 3) {
-    ;;             cell c = s~load_ref();
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(c);
-    ;;         }
-    ;;         if  (refs == 4) {
-    ;;             cell c = s~load_ref();
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(s~load_ref());
-    ;;             stack~tpush(c);
-    ;;         }
-    ;;     }
-    ;;
-    ;;     return begin_cell().end_cell();
 
     if  (hash == tree.cell_hash()) {
         return tree;
     }
 
     tuple stack = empty_tuple();
+
+    slice s = tree.begin_parse();
+    int refs = s.slice_refs();
+
+    if (refs  == 3) {
+        cell c = s~load_ref();
+        stack~tpush(s~load_ref());
+        stack~tpush(c);
+        stack~tpush(s~load_ref());
+    } else {
+        repeat (s.slice_refs()) {
+            stack~tpush(s~load_ref());
+        }
+    }
+
+    cell c = stack~tpop();
+    if (c.cell_hash() == hash) {
+        return c;
+    }
 
     slice s = tree.begin_parse();
     int refs = s.slice_refs();
@@ -133,9 +118,9 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
     if  (refs == 3) {
         cell c = s~load_ref();
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
         stack~tpush(c);
+        stack~tpush(s~load_ref());
+        stack~tpush(s~load_ref());
     }
     if  (refs == 4) {
         cell c = s~load_ref();
@@ -144,7 +129,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         stack~tpush(s~load_ref());
         stack~tpush(s~load_ref());
     }
-
 
     ;;     stack~tpush(tree);
 
