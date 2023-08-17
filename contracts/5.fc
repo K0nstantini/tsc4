@@ -15,21 +15,72 @@
 
 forall X -> (tuple) to_tuple (X x) asm "NOP";
 forall X -> X second(tuple t) asm "SECOND";
-;; forall X -> X first(tuple t) asm "FIRST";
 
-(int, int) fib(int n) asm ""
-        "0 INT"
-        "1 INT"
-        "ROT"
-        "REPEAT:<{ TUCK ADD }>"
-        ;
+;; int fib_matrix(int n) asm ""
+;;
+;;         "<{"
+;;         "DUP"
+;;         "IFNOTRET"
+;;         "DUP DEC"
+;;         "IFNOTRET"
+;;         "DUP 1 RSHIFT#"
+;;         "s9 PUSH"
+;;         "JMPX"
+;;         "}> PUSHCONT"
+;;
+;;         "1 INT 0 INT 0 INT 1 INT"
+;;         "1 INT 1 INT 1 INT 0 INT"
+;;         "9 ROLL"
+;;         "s9 PUSH"
+;;         "EXECUTE"
+;;
+;;         "IF:<{ s3 PUSH  }>ELSE<{ s7 PUSH }>"
+;;         "1 INT ONLYTOPX"
+;;         ;
 
-tuple fib_seq(int n, int prev, int next) asm ""
-        "ROT"
-        "REPEAT:<{ 2DUP ADD }>"
-        "DEPTH"
-        "TUPLEVAR"
-        ;
+;; (int, int, int, int) mul(int a11, int a12, int a21, int a22, int b11, int b12, int b21, int b22) inline {
+;;     return (
+;;             a11 * b11 + a12 * b21, a11 * b12 + a12 * b22,
+;;             a21 * b11 + a22 * b21, a21 * b12 + a22 * b22
+;;     );
+;; }
+;;
+;; (int, int, int, int) pow(int n, int i11, int i12, int i21, int i22, int m11, int m12, int m21, int m22) inline {
+;;     if (n == 0) {
+;;         return (i11, i12, i21, i22);
+;;     }
+;;     if (n == 1) {
+;;         return (m11, m12, m21, m22);
+;;     }
+;;     (int y11, int y12, int y21, int y22) = pow(n / 2, i11, i12, i21, i22, m11, m12, m21, m22);
+;;     (y11, y12, y21, y22) = mul(y11, y12, y21, y22, y11, y12, y21, y22);
+;;     if (n % 2) {
+;;         (y11, y12, y21, y22) = mul(m11, m12, m21, m22, y11, y12, y21, y22);
+;;     }
+;;     return (y11, y12, y21, y22);
+;; }
+;;
+;; int fib_matrix(int n) inline {
+;;     (int i11, int i12, int i21, int i22) = (1, 0, 0, 1);
+;;     (int m11, int m12, int m21, int m22) = (1, 1, 1, 0);
+;;     (_, int prev, _, _) = pow(n, i11, i12, i21, i21, m11, m12, m21, m22);
+;;     return prev;
+;; }
+
+
+;; (int, int) fib(int n) asm ""
+;;         "0 INT"
+;;         "1 INT"
+;;         "ROT"
+;;         "REPEAT:<{ TUCK ADD }>"
+;;         ;
+;;
+;; tuple fib_seq(int n, int prev, int next) asm ""
+;;         "ROT"
+;;         "REPEAT:<{ 2DUP ADD }>"
+;;         "DEPTH"
+;;         "TUPLEVAR"
+;;         ;
 
 tuple fib_new(int k, int n) asm ""
         "0 INT"
@@ -48,11 +99,15 @@ tuple fib_new(int k, int n) asm ""
 
 ;; testable
 (tuple) fibonacci_sequence (int n, int k) method_id {
-    ;;     if (k == 0) {
+
+    ;;     if ((n > 300) & (k > 1)) {
+    ;;         tuple fibs = big_fib();
+    ;;         ~dump(fibs);
+    ;;         int i = n - 300;
+    ;;         ~dump(fibs.at(i));
     ;;         return empty_tuple();
     ;;     }
-    ;;     ~dump(to_tuple([fib_new(k, n - 1).second()]));
-    ;;     return empty_tuple();
+
     return k > 1
             ? fib_new(k, n)
             : k == 0
@@ -60,18 +115,7 @@ tuple fib_new(int k, int n) asm ""
             : n == 0
             ? to_tuple([0])
             : to_tuple([fib_new(k, n - 1).second()]);
-    ;;     if (n == 370) {
-    ;;         return to_tuple([94611056096305838013295371573764256526437182762229865607320618320601813254535]);
-    ;;     }
-    ;;
-    ;;     (int prev, int next) = fib(n);
-    ;;
-    ;;
-    ;;     if (k == 1) {
-    ;;         return to_tuple([prev]);
-    ;;     }
-    ;;
-    ;;     return fib_seq(k - 2, prev, next);
+
 
 }
 
