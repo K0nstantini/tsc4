@@ -100,6 +100,10 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
         }
     }
 
+    if (stack.tlen() == 0) {
+        return begin_cell().end_cell();
+    }
+
     cell c = stack~tpop();
     if (c.cell_hash() == hash) {
         return c;
