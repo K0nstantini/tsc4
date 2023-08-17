@@ -22,17 +22,14 @@ int tlen (tuple t) asm "TLEN";
     tuple result = empty_tuple();
 
     int i_n = 0;
-    ;;     while (i_n < n) {
     repeat (matrixA.tlen()) {
         tuple new_row = empty_tuple();
 
         int i_p = 0;
         repeat (p) {
-            ;;         while (i_p < p) {
             int value = 0;
             int i_m = 0;
             repeat (m) {
-                ;;             while (i_m < m) {
                 value += matrixA.at(i_n).at(i_m) * matrixB.at(i_m).at(i_p);
                 i_m += 1;
             }

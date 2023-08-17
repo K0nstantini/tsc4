@@ -10,11 +10,10 @@ forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
 (slice, slice) load_slice (slice s) asm "LDREFRTOS";
 
 cell pack_cells(tuple t) asm ""
-        "<{"
         "UNCONS"
         "WHILE:<{ OVER ISNULL NOT }>DO<{ SWAP UNCONS ROT STBREFR }>"
         "ENDC"
-        "}>CONT 1 1 CALLXARGS" ;; fix
+        "1 INT ONLYTOPX"
         ;
 
 
