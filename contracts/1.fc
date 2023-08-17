@@ -61,8 +61,8 @@ cell find_cell(cell tree, int hash) asm ""
         }
         if  (refs == 2) {
             cell c = s~load_ref();
-            stack~tpush(c);
             stack~tpush(s~load_ref());
+            stack~tpush(c);
         }
         if  (refs == 3) {
             cell c = s~load_ref();
@@ -74,8 +74,8 @@ cell find_cell(cell tree, int hash) asm ""
             cell c = s~load_ref();
             stack~tpush(s~load_ref());
             stack~tpush(s~load_ref());
-            stack~tpush(c);
             stack~tpush(s~load_ref());
+            stack~tpush(c);
         }
     }
 
