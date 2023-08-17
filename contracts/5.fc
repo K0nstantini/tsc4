@@ -125,7 +125,7 @@ tuple fib_with(int k, int n, int prev, int next) asm ""
             ;;             ? n >= 100
             ;;             ? fib_with(k, n -  100, 354224848179261915075, 573147844013817084101)
             ? n >= 75
-            ? fib_with(k, n -  50, 2111485077978050, 3416454622906707)
+            ? fib_with(k, n -  75, 2111485077978050, 3416454622906707)
             : fib_new(k, n)
             : k == 0
             ? empty_tuple()
