@@ -87,6 +87,27 @@ int bit_size(int n) asm "UBITSIZE";
             }
         }
 
+;;         if (ds.slice_refs_empty?()) {
+;;             (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
+;;             builders~tpush(cur_builder);
+;;             has_ref = 0;
+;;         }  else {
+;;             int left_len = ds~load_uint(bits);
+;;             ds = ds~load_ref().begin_parse();
+;;             bits = ds.slice_bits();
+;;             int flag_len_sub_1 = flag_len - 1;
+;;             int right_len = ds~load_uint(min(flag_len_sub_1, bits));
+;;             int segment = left_len << right_len  + right_len;
+;;             int segment_len = left_len + right_len;
+;;             int shift = segment_len -  flag_len;
+;;             repeat (shift) {
+;;                 if (segment >> shift == flag) {
+;;
+;;                 }
+;;                 shift -= 1;
+;;             }
+;;         }
+
         if (next_slice.slice_data_empty?()) {
             if (ds.slice_refs_empty?()) {
                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
