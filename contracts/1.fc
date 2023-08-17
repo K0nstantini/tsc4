@@ -26,8 +26,8 @@ cell find_cell(cell tree, int hash) asm ""
         "REPEAT:<{ LDREF s3 s3 s0 XCHG3 }>"
         "DROP"
         "DEPTH"
-        "2 SUBINT"
-        ;;         "3 SUBINT"  ;;  ch
+        ;;         "2 SUBINT"
+        "3 SUBINT" ;;  ch
         "IFNOTRET"
 
         "DUP"
@@ -38,12 +38,13 @@ cell find_cell(cell tree, int hash) asm ""
         "3 -ROLL" ;;  ch
         "DUP"
         "EXECUTE"
-                "DEPTH"
-                "2 SUBINT"
-                "IFNOT:<{ NEWC ENDC }>"
-;;                 "1 INT ONLYTOPX"
-;;                 "DEPTH"
-;;         "TUPLEVAR"
+        "DEPTH"
+;;         "2 SUBINT"
+        "3 SUBINT" ;;  ch
+        "IFNOT:<{ NEWC ENDC }>"
+        ;;                 "1 INT ONLYTOPX"
+        ;;                 "DEPTH"
+        ;;         "TUPLEVAR"
         "}>CONT 2 1 CALLXARGS"
         ;
 
@@ -56,10 +57,10 @@ cell find_cell(cell tree, int hash) asm ""
 
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-        return find_cell(tree, hash);
-;;     tuple   res = find_cell(tree, hash);
-;;     ~dump(res);
-;;     return begin_cell().end_cell();
+    return find_cell(tree, hash);
+    ;;     tuple   res = find_cell(tree, hash);
+    ;;     ~dump(res);
+    ;;     return begin_cell().end_cell();
 
     ;;     tuple stack = empty_tuple();
     ;;     stack~tpush(tree);
