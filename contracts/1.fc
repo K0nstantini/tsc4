@@ -128,14 +128,14 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
     }
     if  (refs == 2) {
         cell c = s~load_ref();
-        stack~tpush(s~load_ref());
         stack~tpush(c);
+        stack~tpush(s~load_ref());
     }
     if  (refs == 3) {
         cell c = s~load_ref();
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
         stack~tpush(c);
+        stack~tpush(s~load_ref());
+        stack~tpush(s~load_ref());
     }
     if  (refs == 4) {
         cell c = s~load_ref();
