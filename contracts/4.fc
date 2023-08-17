@@ -6,19 +6,7 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-;;  64 - 1000000
-;;  65 - 1000001
-;;  90 - 1011010
-;;  91 - 1011011
-
-
-;;  96 - 1100000
-;;  97 - 1100001
-;; 122 - 1111010
-;; 123 - 1111011
-
 forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
-;; forall X -> (tuple) to_tuple (X x) asm "NOP";
 (slice, slice) load_slice (slice s) asm "LDREFRTOS";
 
 cell pack_cells(tuple t) asm ""
@@ -29,35 +17,8 @@ cell pack_cells(tuple t) asm ""
         "}>CONT 1 1 CALLXARGS" ;; fix
         ;
 
-;; tuple hashmap(int shift)  asm ""
-;;         "DUP"
-;;         "2 INT"
-;;         "62 INT"
-;;         "REPEAT:<{ DUP INC }>"
-;;         "1 INT"
-;;         "s0 64 s() XCHG"
-;;         "65 SUBCONST"
-;;         "64 INT"
-;;         "26 INT"
-;;         "REPEAT:<{ INC DUP2 ADD 26 INT MOD 65 ADDINT -ROT }>"
-;;         "NIP"
-;;         "INC"
-;;         "5 INT"
-;;         "REPEAT:<{ DUP INC }>"
-;;         "0 INT"
-;;         "s0 97 s() XCHG"
-;;         "97 SUBCONST"
-;;         "96 INT"
-;;         "26 INT"
-;;         "REPEAT:<{ INC DUP2 ADD 26 INT MOD 97 ADDINT -ROT }>"
-;;         "NIP"
-;;         "INC"
-;;         "93 INT"
-;;         "REPEAT:<{ DUP INC }>"
-;;         "TUPLEVAR"
-;;         ;
 
-tuple hashmap(int shift)  asm ""
+tuple hashmap(int shift) asm ""
         "<{"
         "DUP"
         "2 INT"
@@ -93,38 +54,25 @@ tuple hashmap(int shift)  asm ""
         ;
 
 
-
-
-const n26 = 26;
-const n32 = 32;
-
-const n65 = 65;
-const n97 = 97;
-
-const n90 = 90;
-const n122 = 122;
-
-
 () recv_internal() {
 }
 
 (cell) cipher(int shift, cell text) inline {
-    shift %= n26;
+    shift %= 26;
 
     slice ds = text.begin_parse();
-    ds~skip_bits(n32);
+    ds~skip_bits(32);
 
     if ((shift == 0) | ds.slice_data_empty?()) {
         return text;
     }
 
     tuple letters = hashmap(shift);
-    ~dump(letters);
 
     tuple builders = null();
 
     builder cur_builder = begin_cell();
-    cur_builder~store_uint(0, n32);
+    cur_builder~store_uint(0, 32);
 
     repeat (ds.slice_bits() / 8) {
         cur_builder~store_uint(letters.at(ds~load_uint(8)), 8);
