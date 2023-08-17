@@ -38,92 +38,92 @@ describe('Task5', () => {
 
     it('should fibonacci sequence', async () => {
 
-        let res = await task5.getFibonacciSequence(367, 4);
+        // let res = await task5.getFibonacciSequence(367, 4);
+        // const checkEq = (n: number) => expect(res.readNumber()).toEqual(n);
+        // checkEq(22334640661774067356412331900038009953045351020683823507202893507476314037053);
+        // checkEq(36138207717265885328441519836863123286695915870773021050058862406562749608741);
+        // checkEq(58472848379039952684853851736901133239741266891456844557261755914039063645794);
+        // checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
+        // expect(res.remaining).toEqual(0);
+
+        let res = await task5.getFibonacciSequence(1, 3);
+
         const checkEq = (n: number) => expect(res.readNumber()).toEqual(n);
+
+        checkEq(1);
+        checkEq(1);
+        checkEq(2);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(201, 4);
+        checkEq(453973694165307953197296969697410619233826);
+        checkEq(734544867157818093234908902110449296423351);
+        checkEq(1188518561323126046432205871807859915657177);
+        checkEq(1923063428480944139667114773918309212080528);
+        expect(res.remaining).toEqual(0);
+
+        // ============ Extreme values ======================
+
+        res = await task5.getFibonacciSequence(0, 1);
+        checkEq(0);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(0, 255);
+        checkEq(0);
+        for (let i = 0; i < 253; i++) {
+            res.pop();
+        }
+        checkEq(54122222371037658776676579571233761483351206693809497);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(370, 1);
+        checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
+        expect(res.remaining).toEqual(0);
+
+        // =========== N = 0 ==============================
+
+        res = await task5.getFibonacciSequence(0, 2);
+        checkEq(0);
+        checkEq(1);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(0, 3);
+        checkEq(0);
+        checkEq(1);
+        checkEq(1);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(0, 4);
+        checkEq(0);
+        checkEq(1);
+        checkEq(1);
+        checkEq(2);
+        expect(res.remaining).toEqual(0);
+
+
+        res = await task5.getFibonacciSequence(2, 1);
+        checkEq(1);
+        expect(res.remaining).toEqual(0);
+
+
+        res = await task5.getFibonacciSequence(1, 1);
+        checkEq(1);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(367, 4);
         checkEq(22334640661774067356412331900038009953045351020683823507202893507476314037053);
         checkEq(36138207717265885328441519836863123286695915870773021050058862406562749608741);
         checkEq(58472848379039952684853851736901133239741266891456844557261755914039063645794);
         checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
         expect(res.remaining).toEqual(0);
 
-        // let res = await task5.getFibonacciSequence(1, 3);
-        //
-        // const checkEq = (n: number) => expect(res.readNumber()).toEqual(n);
-        //
-        // checkEq(1);
-        // checkEq(1);
-        // checkEq(2);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(201, 4);
-        // checkEq(453973694165307953197296969697410619233826);
-        // checkEq(734544867157818093234908902110449296423351);
-        // checkEq(1188518561323126046432205871807859915657177);
-        // checkEq(1923063428480944139667114773918309212080528);
-        // expect(res.remaining).toEqual(0);
-        //
-        // // ============ Extreme values ======================
-        //
-        // res = await task5.getFibonacciSequence(0, 1);
-        // checkEq(0);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(0, 255);
-        // checkEq(0);
-        // for (let i = 0; i < 253; i++) {
-        //     res.pop();
-        // }
-        // checkEq(54122222371037658776676579571233761483351206693809497);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(370, 1);
-        // checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
-        // expect(res.remaining).toEqual(0);
-        //
-        // // =========== N = 0 ==============================
-        //
-        // res = await task5.getFibonacciSequence(0, 2);
-        // checkEq(0);
-        // checkEq(1);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(0, 3);
-        // checkEq(0);
-        // checkEq(1);
-        // checkEq(1);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(0, 4);
-        // checkEq(0);
-        // checkEq(1);
-        // checkEq(1);
-        // checkEq(2);
-        // expect(res.remaining).toEqual(0);
-        //
-        //
-        // res = await task5.getFibonacciSequence(2, 1);
-        // checkEq(1);
-        // expect(res.remaining).toEqual(0);
-        //
-        //
-        // res = await task5.getFibonacciSequence(1, 1);
-        // checkEq(1);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(367, 4);
-        // checkEq(22334640661774067356412331900038009953045351020683823507202893507476314037053);
-        // checkEq(36138207717265885328441519836863123286695915870773021050058862406562749608741);
-        // checkEq(58472848379039952684853851736901133239741266891456844557261755914039063645794);
-        // checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(369, 2);
-        // checkEq(58472848379039952684853851736901133239741266891456844557261755914039063645794);
-        // checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
-        // expect(res.remaining).toEqual(0);
-        //
-        // res = await task5.getFibonacciSequence(116, 255);
-        // checkEq(781774079430987230203437);
+        res = await task5.getFibonacciSequence(369, 2);
+        checkEq(58472848379039952684853851736901133239741266891456844557261755914039063645794);
+        checkEq(94611056096305838013295371573764256526437182762229865607320618320601813254535);
+        expect(res.remaining).toEqual(0);
+
+        res = await task5.getFibonacciSequence(116, 255);
+        checkEq(781774079430987230203437);
 
 
     });

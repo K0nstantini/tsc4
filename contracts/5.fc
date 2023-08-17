@@ -94,6 +94,16 @@ tuple fib_new(int k, int n) asm ""
         "TUPLEVAR"
         ;
 
+tuple fib_with(int k, int n, int prev, int next) asm ""
+        "ROT"
+        "REPEAT:<{ TUCK ADD }>"
+        "ROT"
+        "2 SUBINT"
+        "REPEAT:<{ 2DUP ADD }>"
+        "DEPTH"
+        "TUPLEVAR"
+        ;
+
 () recv_internal() {
 }
 
@@ -108,8 +118,11 @@ tuple fib_new(int k, int n) asm ""
     ;;         return empty_tuple();
     ;;     }
 
+
     return k > 1
-            ? fib_new(k, n)
+            ? n >= 200
+            ? fib_with(k, n -  200, 280571172992510140037611932413038677189525, 453973694165307953197296969697410619233826)
+            : fib_new(k, n)
             : k == 0
             ? empty_tuple()
             : n == 0
