@@ -26,7 +26,7 @@ cell pack_cells(tuple t) asm ""
         "UNCONS"
         "WHILE:<{ OVER ISNULL NOT }>DO<{ SWAP UNCONS ROT STBREFR }>"
         "ENDC"
-        "}>CONT 1 1 CALLXARGS"  ;; fix
+        "}>CONT 1 1 CALLXARGS" ;; fix
         ;
 
 ;; tuple hashmap(int shift)  asm ""
@@ -57,7 +57,8 @@ cell pack_cells(tuple t) asm ""
 ;;         "TUPLEVAR"
 ;;         ;
 
-tuple hashmap(int shift) asm ""
+tuple hashmap(int shift)  asm ""
+        "<{"
         "DUP"
         "2 INT"
         "62 INT"
@@ -88,7 +89,10 @@ tuple hashmap(int shift) asm ""
         "REPEAT:<{ DUP INC }>"
         "DEPTH"
         "TUPLEVAR"
+        "}>CONT 1 1 CALLXARGS"
         ;
+
+
 
 
 const n26 = 26;
@@ -116,7 +120,6 @@ const n122 = 122;
 
     tuple letters = hashmap(shift);
     ~dump(letters);
-;;     return begin_cell().end_cell();
 
     tuple builders = null();
 
