@@ -96,10 +96,10 @@ int bit_size(int n) asm "UBITSIZE";
             }
             has_ref = 0;
         }  else {
-            int left = ds~load_uint(bits);
+            int left_len = bits;  ;;del
+            int left = ds~load_uint(left_len);
             ds = ds~load_ref().begin_parse();
-            int left_len = flag_len - 1;
-            int right_len = min(left_len, ds.slice_bits());
+            int right_len = min(flag_len - 1, ds.slice_bits());
             if (right_len > 0) { ;; del? but need
                 int right = ds.preload_uint(right_len);
                 int segment = (left << right_len) + right;
@@ -119,6 +119,8 @@ int bit_size(int n) asm "UBITSIZE";
                 } else {
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
                 }
+            } else {
+                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
             }
         }
 
