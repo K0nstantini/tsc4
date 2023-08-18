@@ -92,7 +92,7 @@ int bit_size(int n) asm "UBITSIZE";
         while (has_ref > 0) {
             int remained_bits = ds.slice_bits();
 
-            repeat (remained_bits / 256) { ;; change
+            repeat (remained_bits / 256 - 1) { ;; change
                 int data = ds.preload_uint(256);
                 int n = 0;
                 while (n < masks_len) {
