@@ -1,12 +1,25 @@
-{- 
+{-
   TASK 3 - Find and replace binary substring
   Binary string is represented as a cell linked list: string splitted to chunks,
   first chunk stored to the root cell, next one to the cell in ref and so on;
-  each cell can have only one ref. 
+  each cell can have only one ref.
   Write the method that find and replaces one flags in the binary string
   with another value. Flags and values can be can be of any length, but
   strictly up to 128 bits. The method must replace every flag it finds.
   Flag and the value to be replaced is guaranteed to be greater than 0.
+  Flag and the value may be of different lengths.
+  When there are overlapping flags, only the first one
+  from the overlap needs to be replaced (for example, if the flag is 101,
+  value is 111, and string is 10101, then the result would be 11101, but if
+  the string is 1010101, then the result would be 1110111).
+  Every cell in the input linked list, except for the last one
+  (the one that is the deepest in the tree), is guaranteed to be full
+  (guaranteed to contain 1023 bits).
+  The requirements on the output cell are more loose - only the concatenation of bits
+  from the linked list needs to match that of the expected answer, but the structure
+  itself may be different (for example, for the purposes of comparing the answer,
+  a cell with bit 1 and a ref containing bits 10 is the same as a cell containing
+  bit 11 and a ref with bit 0 - they both make up a bitstring 110).
   Lets give a simple example. We have the target flag 101110101 and the value
   to be written 111111111 as inputs, and a linked list of cells, in which the bit
   value of the first cell ends with ...10100001011, and in the ref we have cell that
@@ -15,6 +28,7 @@
   cell ends with ...10100001111, and the second cell starts with 11111000111111...
 
 -}
+
 
 
 int tlen (tuple t) asm "TLEN";
@@ -64,12 +78,8 @@ int bit_size(int n) asm "UBITSIZE";
     tuple builders = empty_tuple();
     builder cur_builder = begin_cell();
 
-    int cell_max_bit = 1023;
 
     int flag_len = bit_size(flag);
-    int flag_len_sub_1 = flag_len  - 1;
-    int flag_mask = pow2(flag_len) - 1;
-
     int value_len = bit_size(value);
 
     slice flag_slice = cur_builder
@@ -80,43 +90,12 @@ int bit_size(int n) asm "UBITSIZE";
 
     if (flag_len == value_len) {
 
-        tuple values = empty_tuple();
-        tuple masks = empty_tuple();
-
-        int shift = 256 - flag_len;
-        repeat (256 - flag_len + 1) {
-            values~tpush(flag << shift);
-            masks~tpush(flag_mask << shift);
-            shift -= 1;
-        }
-        int masks_len = values.tlen();
+        int flag_mask = pow2(flag_len) - 1;
+        int flag_len_sub_1 = flag_len  - 1;
 
         int has_ref = 1;
         while (has_ref > 0) {
             int remained_bits = ds.slice_bits();
-
-            int can_load = 0;
-            while (ds.slice_bits() >= 256) { ;; change
-                int data = ds.preload_uint(256);
-                int n = 0;
-                while (n < masks_len) {
-                    if (data & masks.at(n) == values.at(n)) {
-                        cur_builder~store_uint(ds~load_uint(can_load), can_load);
-                        cur_builder~store_uint(value, value_len);
-                        ds~skip_bits(flag_len);
-                        n += flag_len;
-                        can_load = 0;
-                    } else {
-                        ;;                                                 int store = ds~load_uint(1);
-                        ;;                                                 cur_builder~store_uint(store, 1);
-                        n += 1;
-                        can_load += 1;
-                    }
-                }
-                cur_builder~store_uint(ds~load_uint(can_load), can_load);
-                can_load = 0;
-            }
-            remained_bits = ds.slice_bits();
 
             while (remained_bits >= flag_len) {
                 (ds, int success) = is_begin_with(ds, flag_slice);
@@ -186,6 +165,8 @@ int bit_size(int n) asm "UBITSIZE";
 
     } else {
 
+        int cell_max_bit = 1023;
+        slice next_slice = flag_slice.skip_bits(flag_len);
 
         int loaded_bits = 0;
         int has_ref = 1;
@@ -209,48 +190,31 @@ int bit_size(int n) asm "UBITSIZE";
                 }
             }
 
-            if (ds.slice_refs_empty?()) {
-                if (remained_bits) {
+            if (next_slice.slice_data_empty?()) {
+                if (ds.slice_refs_empty?()) {
                     (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(remained_bits), remained_bits, cell_max_bit);
-                }
-                if (cur_builder.builder_bits()) {
                     builders~tpush(cur_builder);
-                }
-                has_ref = 0;
-            }  else {
-                if (remained_bits > 0) {
-                    int left = ds~load_uint(remained_bits);
-                    ds = ds~load_ref().begin_parse();
-                    int right_len = min(flag_len_sub_1, ds.slice_bits());
-
-                    int right = ds.preload_uint(right_len);
-                    int segment_len = remained_bits + right_len;
-
-                    int segment = (left << right_len) + right;
-                    if (segment_len >= flag_len) {
-                        int shift = segment_len - flag_len;
-                        int break = 0;
-                        do {
-                            if (((segment >> shift) & flag_mask) == flag) {
-                                break = 1;
-                            } else {
-                                shift -= 1;
-                            }
-                        } until ((shift < 0) | break)
-                        if (shift >= 0) {
-                            ds~skip_bits(right_len - shift);
-                            int left_replaced = shift + flag_len - right_len;
-                            (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, ((left >> left_replaced) << value_len) + value, remained_bits - left_replaced + value_len, cell_max_bit);
-                        }  else {
-                            (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
-                        }
-                    } else {
-                        ds~skip_bits(right_len);
-                        (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
-                    }
+                    has_ref = 0;
                 } else {
-                    ds = ds~load_ref().begin_parse();
+                    slice new_ds = ds~load_ref().begin_parse();
+                    builder db = begin_cell()
+                            .store_uint(ds~load_uint(remained_bits), remained_bits)
+                            .store_slice(new_ds~load_bits(min(cell_max_bit - remained_bits, new_ds.slice_bits())));
+                    (int bits, int refs) = bit_refs(new_ds);
+                    if (refs & (bits == 0)) {
+                        db = db.store_ref(new_ds~load_ref());
+                    }
+                    ds = db.end_cell().begin_parse();
+                    next_slice = new_ds;
                 }
+            } else {
+                builder db = begin_cell()
+                        .store_uint(ds~load_uint(remained_bits), remained_bits)
+                        .store_slice(next_slice~load_bits(next_slice.slice_bits()));
+                if (next_slice.slice_refs()) {
+                    db = db.store_ref(next_slice~load_ref());
+                }
+                ds = db.end_cell().begin_parse();
             }
         }
     }
