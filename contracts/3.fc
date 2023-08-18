@@ -139,14 +139,13 @@ int bit_size(int n) asm "UBITSIZE";
                         } else {
                             (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
                         }
-                    } else { ;; skip
+                    } else {
                         int save_value = (left << right_len) + right;
                         (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, save_value, segment_len, cell_max_bit);
-                        has_ref = 0;
+                        ds~skip_bits(right_len);
                     }
                 } else {
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
-                    has_ref = 0;
                 }
             } else {
                 ds = ds~load_ref().begin_parse();
