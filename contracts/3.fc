@@ -77,11 +77,11 @@ int bit_size(int n) asm "UBITSIZE";
             .end_cell()
             .begin_parse();
 
-    tuple values = empty_tuple();
-    tuple masks = empty_tuple();
-
 
     if (flag_len == value_len) {
+
+        tuple values = empty_tuple();
+        tuple masks = empty_tuple();
 
         int shift = 256 - flag_len;
         repeat (256 - flag_len + 1) {
@@ -95,21 +95,27 @@ int bit_size(int n) asm "UBITSIZE";
         while (has_ref > 0) {
             int remained_bits = ds.slice_bits();
 
+            int can_load = 0;
             while (ds.slice_bits() >= 256) { ;; change
                 int data = ds.preload_uint(256);
                 int n = 0;
+                can_load = 0;
                 while (n < masks_len) {
                     if (data & masks.at(n) == values.at(n)) {
+                        cur_builder~store_uint(ds~load_uint(can_load), can_load);
                         cur_builder~store_uint(value, value_len);
                         ds~skip_bits(flag_len);
                         n += flag_len;
+                        can_load = 0;
                     } else {
-                        int store = ds~load_uint(1);
-                        cur_builder~store_uint(store, 1);
+                        ;;                         int store = ds~load_uint(1);
+                        ;;                         cur_builder~store_uint(store, 1);
                         n += 1;
+                        can_load += 1;
                     }
                 }
             }
+            cur_builder~store_uint(ds~load_uint(can_load), can_load);
             remained_bits = ds.slice_bits();
 
             while (remained_bits >= flag_len) {
