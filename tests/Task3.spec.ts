@@ -153,18 +153,22 @@ describe('Task3', () => {
             )
             .endCell();
 
-        // let c = beginCell()
-        //     .storeUint(0b1100001001, 10)
-        //     .storeRef(
-        //         beginCell()
-        //             .storeUint(0b1010110110011, 13)
-        //             .endCell()
-        //     )
-        //     .endCell();
-        // let res = await task3.getFindAndReplace(0b1100001001, 0b111, c);
-
-        let res = await task3.getFindAndReplace(flag, value, list);
+        let c = beginCell()
+            .storeUint(0b10000101, 1023)
+            .storeRef(
+                beginCell()
+                    .storeUint(0b10100001, 8)
+                    .endCell()
+            )
+            .endCell();
+        let res = await task3.getFindAndReplace(0b10101, 0b1, c);
         let ds = res.beginParse();
+        expect(ds.loadUint(1023)).toEqual(0b10000101);
+        ds = ds.loadRef().beginParse();
+        expect(ds.loadUint(3)).toEqual(0b101);
+
+        res = await task3.getFindAndReplace(flag, value, list);
+        ds = res.beginParse();
         expect(ds.loadBits(1016).toString()).toEqual("546FE461792C207F65206172652067EFE96E67207C6F207C65616368206FF5722070726FF37065637C697E6520627D696C6465727320686FF7207C6F206D696E65206FEE20544FCE20426C6FE36B636861696E2E205468697320657870657269656E6365207F696C6C20616C6C6FF720616C6C206FE620796FF5207C6F207D");
         expect(ds.loadUint(7)).toEqual(7);
         ds = ds.loadRef().beginParse();

@@ -32,6 +32,11 @@ int bit_size(int n) asm "UBITSIZE";
     if (loaded_bits + value_len <= cell_max_bit) {
         b~store_uint(value, value_len);
         loaded_bits += value_len;
+        if (loaded_bits == cell_max_bit) {
+            builders~tpush(b);
+            b = begin_cell();
+            loaded_bits = 0;
+        }
     } else {
         int left_len = cell_max_bit - loaded_bits;
         int right_len = value_len - left_len;
@@ -71,10 +76,14 @@ int bit_size(int n) asm "UBITSIZE";
 
     ;;     slice next_slice = flag_slice.skip_bits(flag_len);
 
+
     int loaded_bits = 0;
     int has_ref = 1;
     while (has_ref > 0) {
         int bits = ds.slice_bits();
+        ;;         if (bits == 8) {
+        ;;             return linked_list;
+        ;;         };
         while (bits >= flag_len) {
             (ds, int success) = is_begin_with(ds, flag_slice);
             if (success) {
@@ -101,6 +110,7 @@ int bit_size(int n) asm "UBITSIZE";
             }
             has_ref = 0;
         }  else {
+            ;;             ~strdump("Start segment");
             int left_len = bits; ;;del
             int left = ds~load_uint(left_len);
             ds = ds~load_ref().begin_parse();
@@ -111,19 +121,55 @@ int bit_size(int n) asm "UBITSIZE";
                 int segment_len = left_len + right_len;
                 int shift = segment_len - flag_len;
                 int mask = pow2(flag_len) - 1;
-                while ((shift >= 0) & (((segment >> shift) & mask) != flag)) { ;; until
-                    shift -= 1;
-                }
+                ;;                 ~dump(segment);
+                ;;                 ~dump(segment_len);
+                ;;                 ~dump(shift);
+                ;;                 ~dump(mask);
+                ;;                 ~dump(segment >> shift);
+                ;;                 ~dump((segment >> shift) & mask);
+                ;;                 ~dump((segment >> 1) & mask);
+                ;;                 return linked_list;
+                int break = 0;
+                do {
+                    if (((segment >> shift) & mask) == flag) {
+                        break = 1;
+                    } else {
+                        shift -= 1;
+                    }
+                } until ((shift < 0) | break)
+                ;;                 while ((((segment >> shift) & mask) != flag) & (shift >= 0)) { ;; until
+                ;; ;;                     ~strdump("In cycle");
+                ;;                     shift -= 1;
+                ;;                 }
+                ;;                 shift -= 1;
+                ;;                 ~strdump("Left");
+                ;;                 ~dump(left);
+                ;;                 ~dump(left_len);
+                ;;                 ~strdump("Right");
+                ;;                 ~dump(right);
+                ;;                 ~dump(right_len);
+                ;;                 ~strdump("Segment");
+                ;;                 ~dump(segment);
+                ;;                 ~dump(segment_len);
+                ;;                 ~dump(shift);
                 if (shift >= 0) {
                     int right_skip = right_len - shift;
                     ds~skip_bits(right_skip);
                     int left = left >> (shift + 1);
-                    int left = left >> (left_len  - shift - 1);
                     int replace = (left << value_len) + value;
                     int replace_len = left_len - shift - 1 + value_len;
+                    ;;                     ~strdump("Shift > 0");
+                    ;;                     ~dump(right_skip);
+                    ;;                     ~dump(left);
+                    ;;                     ~dump(replace);
+                    ;;                     ~dump(replace_len);
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, replace, replace_len, cell_max_bit);
                 } else {
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
+                    ;;                     ~dump(cur_builder);
+                    ;;                     ~dump(loaded_bits);
+                    ;;                     ~dump(ds.slice_bits());
+                    ;;                     return linked_list;
                 }
             } else {
                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
