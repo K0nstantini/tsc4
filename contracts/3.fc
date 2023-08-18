@@ -82,7 +82,7 @@ int bit_size(int n) asm "UBITSIZE";
 
         int remained_bits = ds.slice_bits();
 
-        if (flag_len > 15) {
+        if (flag_len > 5) {
 
             int all_bits = remained_bits;
             int preload_value_len = min(256, all_bits);
