@@ -1,9 +1,8 @@
 import {Blockchain, SandboxContract} from '@ton-community/sandbox';
-import {beginCell, BitString, Cell, Slice, toNano} from 'ton-core';
+import {beginCell, Cell, toNano} from 'ton-core';
 import {Task3} from '../wrappers/Task3';
 import '@ton-community/test-utils';
 import {compile} from '@ton-community/blueprint';
-import {hex_to_ascii} from "./Task4.spec";
 
 describe('Task3', () => {
     let code: Cell;
@@ -153,19 +152,35 @@ describe('Task3', () => {
             )
             .endCell();
 
-        let c = beginCell()
-            .storeUint(0b10000101, 1023)
-            .storeRef(
-                beginCell()
-                    .storeUint(0b10100001, 8)
-                    .endCell()
-            )
-            .endCell();
-        let res = await task3.getFindAndReplace(0b101101, 0b1, c);
+        let c = (ov: number, iv: number, ivl: number) => {
+            let innerCell = beginCell()
+                .storeUint(iv, ivl)
+                .endCell();
+            return beginCell()
+                .storeUint(ov, 1023)
+                .storeRef(innerCell)
+                .endCell();
+        }
+
+        // ======================== Flag < Segment ===================================
+
+        let targetCell = c(0b100010001, 0b11, 2);
+        let res = await task3.getFindAndReplace(0b111111, 0b1, targetCell);
         let ds = res.beginParse();
-        expect(ds.loadUint(1023)).toEqual(0b10000100);
+        expect(ds.loadUint(1023)).toEqual(0b100010001);
         ds = ds.loadRef().beginParse();
-        expect(ds.loadUint(3)).toEqual(0b001);
+        expect(ds.loadUint(2)).toEqual(0b11);
+        expect(ds.remainingBits).toEqual(0);
+        expect(ds.remainingRefs).toEqual(0);
+
+        // ======================== Flag == Segment ===================================
+
+        targetCell = c(0b100010010, 0b11, 2);
+        res = await task3.getFindAndReplace(0b1011, 0b1, targetCell);
+        ds = res.beginParse();
+        expect(ds.loadUint(1022)).toEqual(0b10001001);
+        expect(ds.remainingBits).toEqual(0);
+        expect(ds.remainingRefs).toEqual(0);
 
         res = await task3.getFindAndReplace(flag, value, list);
         ds = res.beginParse();
