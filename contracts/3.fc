@@ -64,7 +64,7 @@ int bit_size(int n) asm "UBITSIZE";
             .end_cell()
             .begin_parse();
 
-;;     slice next_slice = flag_slice.skip_bits(flag_len);
+    ;;     slice next_slice = flag_slice.skip_bits(flag_len);
 
     int loaded_bits = 0;
     int has_ref = 1;
@@ -96,52 +96,56 @@ int bit_size(int n) asm "UBITSIZE";
             ds = ds~load_ref().begin_parse();
             int left_len = flag_len - 1;
             int right_len = min(left_len, ds.slice_bits());
-            int right = ds.preload_uint(right_len);
-            int segment = (left << right_len) + right;
-            int segment_len = left_len + right_len;
-            int shift = segment_len - flag_len;
-            int mask = pow2(flag_len) - 1;
-            while ((((segment >> shift) & mask) != flag) & (shift >= 0)) { ;; until
-                shift -= 1;
-            }
-            if (shift >= 0) {
-                int right_skip = right_len - shift;
-                ds~skip_bits(right_skip);
-                int left = left >> (shift + 1);
-                int replace = (left << value_len) + value;
-                int replace_len = left_len - shift - 1 + value_len;
-                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, replace, replace_len, cell_max_bit);
+            if (right_len > 0) {  ;; del?
+                int right = ds.preload_uint(right_len);
+                int segment = (left << right_len) + right;
+                int segment_len = left_len + right_len;
+                int shift = segment_len - flag_len;
+                int mask = pow2(flag_len) - 1;
+                while ((((segment >> shift) & mask) != flag) & (shift >= 0)) { ;; until
+                    shift -= 1;
+                }
+                if (shift >= 0) {
+                    int right_skip = right_len - shift;
+                    ds~skip_bits(right_skip);
+                    int left = left >> (shift + 1);
+                    int replace = (left << value_len) + value;
+                    int replace_len = left_len - shift - 1 + value_len;
+                    (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, replace, replace_len, cell_max_bit);
+                } else {
+                    (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
+                }
             } else {
                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, left_len, cell_max_bit);
             }
         }
 
-;;         if (next_slice.slice_data_empty?()) {
-;;             if (ds.slice_refs_empty?()) {
-;;                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
-;;                 builders~tpush(cur_builder);
-;;                 has_ref = 0;
-;;             } else {
-;;                 slice new_ds = ds~load_ref().begin_parse();
-;;                 builder db = begin_cell()
-;;                         .store_uint(ds~load_uint(bits), bits)
-;;                         .store_slice(new_ds~load_bits(min(cell_max_bit - bits, new_ds.slice_bits())));
-;;                 (int bits, int refs) = bit_refs(new_ds);
-;;                 if (refs & (bits == 0)) {
-;;                     db = db.store_ref(new_ds~load_ref());
-;;                 }
-;;                 ds = db.end_cell().begin_parse();
-;;                 next_slice = new_ds;
-;;             }
-;;         } else {
-;;             builder db = begin_cell()
-;;                     .store_uint(ds~load_uint(bits), bits)
-;;                     .store_slice(next_slice~load_bits(next_slice.slice_bits()));
-;;             if (next_slice.slice_refs()) {
-;;                 db = db.store_ref(next_slice~load_ref());
-;;             }
-;;             ds = db.end_cell().begin_parse();
-;;         }
+        ;;         if (next_slice.slice_data_empty?()) {
+        ;;             if (ds.slice_refs_empty?()) {
+        ;;                 (builders, _) = cur_builder~save_bits(builders, loaded_bits, ds~load_uint(bits), bits, cell_max_bit);
+        ;;                 builders~tpush(cur_builder);
+        ;;                 has_ref = 0;
+        ;;             } else {
+        ;;                 slice new_ds = ds~load_ref().begin_parse();
+        ;;                 builder db = begin_cell()
+        ;;                         .store_uint(ds~load_uint(bits), bits)
+        ;;                         .store_slice(new_ds~load_bits(min(cell_max_bit - bits, new_ds.slice_bits())));
+        ;;                 (int bits, int refs) = bit_refs(new_ds);
+        ;;                 if (refs & (bits == 0)) {
+        ;;                     db = db.store_ref(new_ds~load_ref());
+        ;;                 }
+        ;;                 ds = db.end_cell().begin_parse();
+        ;;                 next_slice = new_ds;
+        ;;             }
+        ;;         } else {
+        ;;             builder db = begin_cell()
+        ;;                     .store_uint(ds~load_uint(bits), bits)
+        ;;                     .store_slice(next_slice~load_bits(next_slice.slice_bits()));
+        ;;             if (next_slice.slice_refs()) {
+        ;;                 db = db.store_ref(next_slice~load_ref());
+        ;;             }
+        ;;             ds = db.end_cell().begin_parse();
+        ;;         }
     }
 
     builder value = builders~tpop();
