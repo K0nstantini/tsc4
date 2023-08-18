@@ -110,8 +110,8 @@ int bit_size(int n) asm "UBITSIZE";
                 ds = ds~load_ref().begin_parse();
                 int right_len = min(flag_len - 1, ds.slice_bits());
 
-                int save_value = left;
-                int save_value_len = remained_bits;
+;;                 int save_value = left;
+;;                 int save_value_len = remained_bits;
 
                 int right = ds.preload_uint(right_len);
                 int segment_len = remained_bits + right_len;
@@ -131,15 +131,17 @@ int bit_size(int n) asm "UBITSIZE";
                     if (shift >= 0) {
                         ds~skip_bits(right_len - shift);
                         int left_replaced = shift + flag_len - right_len;
-                        save_value = ((left >> left_replaced) << value_len) + value;
-                        save_value_len = remained_bits - left_replaced + value_len;
+                        (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, ((left >> left_replaced) << value_len) + value, remained_bits - left_replaced + value_len, cell_max_bit);
+                    }  else {
+                        (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
                     }
                 } else {
-                    save_value = segment;
-                    save_value_len = segment_len;
+;;                     save_value = segment;
+;;                     save_value_len = segment_len;
                     ds~skip_bits(right_len);
+                    (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
                 }
-                (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, save_value, save_value_len, cell_max_bit);
+;;                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, save_value, save_value_len, cell_max_bit);
             } else {
                 ds = ds~load_ref().begin_parse();
             }
