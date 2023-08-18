@@ -105,7 +105,7 @@ int bit_size(int n) asm "UBITSIZE";
             }
             has_ref = 0;
         }  else {
-            if (remained_bits > 0) {
+;;             if (remained_bits > 0) {
                 int left = ds~load_uint(remained_bits);
                 ds = ds~load_ref().begin_parse();
                 int right_len = min(flag_len - 1, ds.slice_bits());
@@ -133,16 +133,16 @@ int bit_size(int n) asm "UBITSIZE";
                         (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
                     }
                 } else {
-;;                     ds~skip_bits(right_len);
+                    ds~skip_bits(right_len);
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, left, remained_bits, cell_max_bit);
-                    if (cur_builder.builder_bits()) {
-                        builders~tpush(cur_builder);
-                    }
-                    has_ref = 0;
+;;                     if (cur_builder.builder_bits()) {
+;;                         builders~tpush(cur_builder);
+;;                     }
+;;                     has_ref = 0;
                 }
-            } else {
-                ds = ds~load_ref().begin_parse();
-            }
+;;             } else {
+;;                 ds = ds~load_ref().begin_parse();
+;;             }
         }
     }
 
