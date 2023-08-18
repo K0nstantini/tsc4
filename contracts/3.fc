@@ -46,6 +46,11 @@ int bit_size(int n) asm "UBITSIZE";
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
+
+    if  (flag == value) {
+        return linked_list;
+    }
+
     slice ds = linked_list.begin_parse();
     if (ds.slice_data_empty?()) {
         return linked_list;
@@ -96,7 +101,7 @@ int bit_size(int n) asm "UBITSIZE";
             }
             has_ref = 0;
         }  else {
-            int left_len = bits;  ;;del
+            int left_len = bits; ;;del
             int left = ds~load_uint(left_len);
             ds = ds~load_ref().begin_parse();
             int right_len = min(flag_len - 1, ds.slice_bits());
