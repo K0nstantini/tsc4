@@ -68,6 +68,8 @@ int bit_size(int n) asm "UBITSIZE";
 
     int flag_len = bit_size(flag);
     int flag_len_sub_1 = flag_len  - 1;
+    int flag_mask = pow2(flag_len) - 1;
+
     int value_len = bit_size(value);
 
     slice flag_slice = cur_builder
@@ -75,12 +77,38 @@ int bit_size(int n) asm "UBITSIZE";
             .end_cell()
             .begin_parse();
 
+    tuple masks = empty_tuple();
+    int shift = 256 - flag_len;
+    repeat (256 / flag_len) {
+        masks~tpush(flag << shift);
+        shift -= 1;
+    }
+    masks~tpush(flag);
+    int masks_len = masks.tlen();
 
     if (flag_len == value_len) {
 
         int has_ref = 1;
         while (has_ref > 0) {
             int remained_bits = ds.slice_bits();
+
+            repeat (remained_bits / 256) { ;; change
+                int data = ds.preload_uint(256);
+                int n = 0;
+                while (n < masks_len) {
+                    int mask = masks.at(n);
+                    if (data & mask == mask) { ;;change to  data ^ mask == 0
+                        cur_builder~store_uint(value, value_len);
+                        ds~skip_bits(flag_len);
+                        n += value_len;
+                    } else {
+                        int store = ds~load_uint(1);
+                        cur_builder~store_uint(store, 1);
+                        n += 1;
+                    }
+                }
+            }
+            remained_bits = ds.slice_bits();
 
             while (remained_bits >= flag_len) {
                 (ds, int success) = is_begin_with(ds, flag_slice);
@@ -111,10 +139,9 @@ int bit_size(int n) asm "UBITSIZE";
                     int segment = (left << right_len) + right;
                     if (segment_len >= flag_len) {
                         int shift = segment_len - flag_len;
-                        int mask = pow2(flag_len) - 1;
                         int break = 0;
                         do {
-                            if (((segment >> shift) & mask) == flag) {
+                            if (((segment >> shift) & flag_mask) == flag) {
                                 break = 1;
                             } else {
                                 shift -= 1;
@@ -194,10 +221,9 @@ int bit_size(int n) asm "UBITSIZE";
                     int segment = (left << right_len) + right;
                     if (segment_len >= flag_len) {
                         int shift = segment_len - flag_len;
-                        int mask = pow2(flag_len) - 1;
                         int break = 0;
                         do {
-                            if (((segment >> shift) & mask) == flag) {
+                            if (((segment >> shift) & flag_mask) == flag) {
                                 break = 1;
                             } else {
                                 shift -= 1;
