@@ -161,11 +161,11 @@ describe('Task3', () => {
                     .endCell()
             )
             .endCell();
-        let res = await task3.getFindAndReplace(0b10101, 0b1, c);
+        let res = await task3.getFindAndReplace(0b101101, 0b1, c);
         let ds = res.beginParse();
-        expect(ds.loadUint(1023)).toEqual(0b10000101);
+        expect(ds.loadUint(1023)).toEqual(0b10000100);
         ds = ds.loadRef().beginParse();
-        expect(ds.loadUint(3)).toEqual(0b101);
+        expect(ds.loadUint(3)).toEqual(0b001);
 
         res = await task3.getFindAndReplace(flag, value, list);
         ds = res.beginParse();
