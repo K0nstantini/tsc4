@@ -95,15 +95,14 @@ int bit_size(int n) asm "UBITSIZE";
         while (has_ref > 0) {
             int remained_bits = ds.slice_bits();
 
-            while (ds.slice_bits() >= 256) { ;; change
+            if (ds.slice_bits() >= 256) { ;; change
                 int data = ds.preload_uint(256);
                 int n = 0;
                 while (n < masks_len) {
-                    int mask = values.at(n);
                     if (data & masks.at(n) == values.at(n)) {
                         cur_builder~store_uint(value, value_len);
                         ds~skip_bits(flag_len);
-                        n += value_len;
+                        n += flag_len;
                     } else {
                         int store = ds~load_uint(1);
                         cur_builder~store_uint(store, 1);
