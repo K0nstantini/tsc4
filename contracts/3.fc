@@ -99,12 +99,9 @@ int bit_size(int n) asm "UBITSIZE";
             while (ds.slice_bits() >= 256) { ;; change
                 int data = ds.preload_uint(256);
                 int n = 0;
-                can_load = 0;
                 while (n < masks_len) {
                     if (data & masks.at(n) == values.at(n)) {
-                        if (can_load > 0) {
-                            cur_builder~store_uint(ds~load_uint(can_load), can_load);
-                        }
+                        cur_builder~store_uint(ds~load_uint(can_load), can_load);
                         cur_builder~store_uint(value, value_len);
                         ds~skip_bits(flag_len);
                         n += flag_len;
@@ -116,9 +113,8 @@ int bit_size(int n) asm "UBITSIZE";
                         can_load += 1;
                     }
                 }
-            }
-            if (can_load > 0) {
                 cur_builder~store_uint(ds~load_uint(can_load), can_load);
+                can_load = 0;
             }
             remained_bits = ds.slice_bits();
 
