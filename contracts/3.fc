@@ -116,7 +116,7 @@ int bit_size(int n) asm "UBITSIZE";
                 int save_value = left;
                 int save_value_len = left_len;
 
-                if (right_len > 0) { ;; del?
+;;                 if (right_len > 0) { ;; del?
                     int right = ds.preload_uint(right_len);
                     int segment_len = left_len + right_len;
 
@@ -144,7 +144,7 @@ int bit_size(int n) asm "UBITSIZE";
                         save_value_len = segment_len;
                         ds~skip_bits(right_len);
                     }
-                }
+;;                 }
                 (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, save_value, save_value_len, cell_max_bit);
             } else {
                 ds = ds~load_ref().begin_parse();
