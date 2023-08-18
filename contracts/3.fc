@@ -47,7 +47,7 @@ int bit_size(int n) asm "UBITSIZE";
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
 
-    if  (flag == value) {
+    if (flag == value) {
         return linked_list;
     }
 
@@ -111,13 +111,14 @@ int bit_size(int n) asm "UBITSIZE";
                 int segment_len = left_len + right_len;
                 int shift = segment_len - flag_len;
                 int mask = pow2(flag_len) - 1;
-                while ((((segment >> shift) & mask) != flag) & (shift >= 0)) { ;; until
+                while ((shift >= 0) & (((segment >> shift) & mask) != flag)) { ;; until
                     shift -= 1;
                 }
                 if (shift >= 0) {
                     int right_skip = right_len - shift;
                     ds~skip_bits(right_skip);
                     int left = left >> (shift + 1);
+                    int left = left >> (left_len  - shift - 1);
                     int replace = (left << value_len) + value;
                     int replace_len = left_len - shift - 1 + value_len;
                     (builders, loaded_bits) = cur_builder~save_bits(builders, loaded_bits, replace, replace_len, cell_max_bit);
