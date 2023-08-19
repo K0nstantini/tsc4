@@ -9,67 +9,32 @@
 int tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
-;; cell find_cell(cell tree, int hash) asm ""
-;;         "<{"
-;;         "IFNOTRET"
-;;         "ROT"
-;;         "s2 s0 PUSH2"
-;;         "HASHCU"
-;;         "EQUAL"
-;;         "IFRET"
-;;         "CTOS"
-;;         "DUP"
-;;         "SREFS"
-;;         "REPEAT:<{ LDREF s3 s1 PUSH2 HASHCU EQUAL IF:<{ DROP 0 INT s2 PUSH JMPX }>ELSE<{ s3 s3 s0 XCHG3 }> }>"
-;;         "ISNULL"
-;;         "IFRET"
-;;         ;;         "DROP"
-;;         "DEPTH"
-;;         "2 SUBINT"
-;;         "IFNOTRET"
-;;         "DUP"
-;;         "1 INT"
-;;         "JMPX"
-;;         "}> PUSHCONT"
-;;
-;;         "1 INT"
-;;         "DUP"
-;;         "EXECUTE"
-;;         ;;         "DEPTH"
-;;         ;;         "2 SUBINT"
-;;         ;;         "IFNOT:<{ NEWC ENDC }>"
-;;         "NEWC ENDC"
-;;         "1 INT ONLYTOPX"
-;;         ;
+cell find_cell(cell tree, int hash) asm ""
+        "<{"
+        "ROT"
+        "s2 s0 PUSH2"
+        "HASHCU"
+        "EQUAL"
+        "IFRET"
+        "CTOS"
+        "DUP"
+        "SREFS"
+        "REPEAT:<{ LDREF s3 s3 s0 XCHG3 }>"
+        "DROP"
+        "DEPTH"
+        "2 SUBINT"
+        "IFNOTRET"
+        "DUP"
+        "JMPX"
+        "}> PUSHCONT"
 
-;; cell find_cell(cell tree, int hash) asm ""
-;;
-;;         "<{"
-;;         "DUP2"
-;;         "HASHCU"
-;;         "EQUAL"
-;;         "}>CONT 1 1 CALLXARGS"
-;;
-;;         "<{"
-;;         "ROT"
-;;         "s2 s0 PUSH2"
-;;         "HASHCU"
-;;         "EQUAL"
-;;         "IFRET"
-;;         "CTOS"
-;;         "DUP"
-;;         "SREFS"
-;;         "REPEAT:<{ LDREF 3 -ROLL OVER JMPX }>"
-;;         "}> PUSHCONT"
-;;
-;;         "DUP"
-;;         "EXECUTE"
-;;
-;;         "DEPTH"
-;;         "2 SUBINT"
-;;         "IFNOT:<{ NEWC ENDC }>"
-;;         "1 INT ONLYTOPX"
-;;         ;
+        "DUP"
+        "EXECUTE"
+        "DEPTH"
+        "2 SUBINT"
+        "IFNOT:<{ NEWC ENDC }>"
+        "1 INT ONLYTOPX"
+        ;
 
 
 () recv_internal() {
@@ -77,53 +42,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 ;; testable
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
-    ;;     return find_cell(tree, hash);
-
-
-    if  (hash == tree.cell_hash()) {
-        return tree;
-    }
-
-    tuple stack = empty_tuple();
-
-    slice s = tree.begin_parse();
-    int refs = s.slice_refs();
-
-    if (refs == 1) {
-        stack~tpush(s~load_ref());
-    }
-    if  (refs == 2) {
-        cell c = s~load_ref();
-        stack~tpush(s~load_ref());
-        stack~tpush(c);
-    }
-    if  (refs == 3) {
-        cell c = s~load_ref();
-        stack~tpush(c);
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
-    }
-    if  (refs == 4) {
-        cell c = s~load_ref();
-        stack~tpush(c);
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
-        stack~tpush(s~load_ref());
-    }
-
-
-    ;;     stack~tpush(tree);
-
-    while (stack.tlen()) {
-        cell c = stack~tpop();
-        if (c.cell_hash() == hash) {
-            return c;
-        }
-        slice s = c.begin_parse();
-        repeat (s.slice_refs()) {
-            stack~tpush(s~load_ref());
-        }
-    }
-    return begin_cell().end_cell();
+    return find_cell(tree, hash);
 
 }
